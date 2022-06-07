@@ -1,0 +1,12 @@
+{
+  "name": "Jira",
+  "description": "Chrome Extension, Vue, Typescript",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "storage"
+  ]
+}
