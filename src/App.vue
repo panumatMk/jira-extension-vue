@@ -2,14 +2,19 @@
 import Menu from "./components/Menu.vue";
 import { RouterView, useRoute } from "vue-router";
 import { computed } from "vue";
+import router from "@/router";
 
 const route = useRoute();
 
+router.push('/login')
+
 const path = computed(() => {
-  if (route.fullPath === "/login") {
-    return "Login";
+  switch (route.fullPath) {
+    case "/login": return "Login";
+    case "/logwork": return "Logwork";
+    case "/history": return "History";
+    default: return ""
   }
-  return "";
 });
 </script>
 

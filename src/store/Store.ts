@@ -1,5 +1,6 @@
-import { reactive } from "vue";
 import type { LoginStage } from "@/models/StageInterface";
+import { reactive, toRef } from "vue";
+import { from } from "@vueuse/rxjs";
 
 interface AppStage {
   loginStage?: LoginStage;
@@ -9,7 +10,9 @@ export const loginStage: LoginStage = {
   host: "",
   username: "",
   password: "",
-  accessToken: ""
+  accessToken: "",
+  useAccessToken: undefined,
+  online: undefined
 };
 
 const initState: AppStage = {
@@ -17,6 +20,14 @@ const initState: AppStage = {
 };
 
 export const store = reactive<AppStage>(initState);
+
+
+// transform to Observable
+export function useStoreObservable<T extends keyof AppStage>(key: T) {
+  const stageRef = toRef(store, key);
+  const stageRef$ = from(stageRef);
+  return stageRef$;
+}
 
 
 

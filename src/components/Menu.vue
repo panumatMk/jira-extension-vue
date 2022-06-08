@@ -6,7 +6,7 @@ const list = ref<Menu[]>([
   {
     label: "Logwork",
     icon: "pi pi-fw pi-user",
-    to: '/',
+    to: "/logwork",
     command: () => {
       console.log("clicked");
     }
@@ -14,7 +14,7 @@ const list = ref<Menu[]>([
   {
     label: "History",
     icon: "pi pi-fw pi-user",
-    to: '/',
+    to: "/history",
     command: () => {
       console.log("clicked");
     }
@@ -25,7 +25,7 @@ const list = ref<Menu[]>([
   {
     label: "Login",
     icon: "pi pi-fw pi-circle-fill",
-    to: '/login',
+    to: "/login"
   }
 ]);
 </script>
@@ -35,7 +35,8 @@ const list = ref<Menu[]>([
   </TieredMenu>
 </template>
 
-
-<style scoped>
+<style scoped lang="sass">
+::v-deep span.p-menuitem-icon.pi.pi-fw.pi-circle-fill
+  color: red !important
 
 </style>
