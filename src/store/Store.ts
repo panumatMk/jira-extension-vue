@@ -1,10 +1,6 @@
-import type { LoginStage } from "@/models/StageInterface";
+import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { reactive, toRef } from "vue";
 import { from } from "@vueuse/rxjs";
-
-interface AppStage {
-  loginStage?: LoginStage;
-}
 
 export const loginStage: LoginStage = {
   host: "",

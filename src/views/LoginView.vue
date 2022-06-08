@@ -56,11 +56,13 @@
 
 <script setup lang="ts">
 
-import { ref, watchEffect } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { LoginAction } from "@/store/Login";
+import { map, merge, of, ReplaySubject, switchMap, take, takeUntil, timer } from "rxjs";
+import type { AppStage, LoginStage } from "@/models/StageInterface";
+import { from } from "@vueuse/rxjs";
+import { useGetLocalStorage, useSetLocalStorage } from "@/google/Google";
 import { useStoreObservable } from "@/store/Store";
-import { of, switchMap, take, timer } from "rxjs";
-import type { LoginStage } from "@/models/StageInterface";
 
 const host = ref("");
 const username = ref("");
@@ -68,46 +70,58 @@ const password = ref("");
 const accessToken = ref("");
 const useAccessToken = ref(false);
 const onlineStatus = ref(false);
-
 let testConnectionBtn = ref();
+const destroy$ = new ReplaySubject<void>();
 
-useStoreObservable("loginStage")
-  .pipe(
-    take(2),
-    switchMap(value => of(value))
-  )
-  .subscribe((value) => {
-    console.log(value);
-  });
 
-watchEffect((onCleanup) => {
-  const loginStage: LoginStage = {
-    host: host.value,
-    username: username.value,
-    password: password.value,
-    accessToken: accessToken.value,
-    useAccessToken: useAccessToken.value,
-    online: onlineStatus.value
-  };
-
-  const subscription = timer(500)
-    .subscribe(() => LoginAction.updateStage(loginStage));
-
-  onCleanup(() => {
-    subscription.unsubscribe();
-  });
+onMounted(() => {
+  const key: keyof AppStage = "loginStage";
+  useGetLocalStorage([key])
+    .pipe(take(1))
+    .subscribe((stage: any) => {
+      console.log('set default', stage);
+      const loginStage:Required<LoginStage> = stage?.loginStage;
+      host.value = loginStage.host;
+      username.value = loginStage.username;
+      password.value = loginStage.password;
+      useAccessToken.value = loginStage.useAccessToken;
+      onlineStatus.value = loginStage.online;
+    });
 });
+
+onUnmounted(() => {
+  destroy$.next();
+  destroy$.complete();
+});
+
+merge(from(host), from(username), from(password), from(accessToken))
+  .pipe(
+    switchMap(data => timer(500).pipe(map(() => data))),
+    takeUntil(destroy$)
+  )
+  .subscribe(() => {
+    const loginStage: LoginStage = {
+      host: host.value,
+      username: username.value,
+      password: password.value,
+      accessToken: accessToken.value,
+      useAccessToken: useAccessToken.value,
+      online: onlineStatus.value
+    };
+    LoginAction.updateStage(loginStage);
+  });
 
 const setUseAccessToken = (use: boolean) => {
   useAccessToken.value = use;
+  LoginAction.updateUseAccessToken(use);
 };
 
 const testConnection = () => {
   const currentClassName = testConnectionBtn.value.$el.children[0].className;
-  testConnectionBtn.value.$el.children[0].className = currentClassName + ' pi-spin';
+  testConnectionBtn.value.$el.children[0].className = currentClassName + " pi-spin";
 
   timer(2000).subscribe(() => {
-    onlineStatus.value = true
+    onlineStatus.value = true;
     testConnectionBtn.value.$el.children[0].className = currentClassName;
   });
 };

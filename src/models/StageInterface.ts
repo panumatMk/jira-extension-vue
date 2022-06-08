@@ -6,3 +6,7 @@ export interface LoginStage {
   useAccessToken?: boolean
   online?: boolean
 }
+
+export interface AppStage {
+  loginStage?: LoginStage;
+}
