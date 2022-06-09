@@ -21,7 +21,7 @@ export namespace Service {
     const { loginStage } = store;
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.get_search}`,
-      method: "POST",
+      method: "GET",
       headers: getHeader()
     });
   }

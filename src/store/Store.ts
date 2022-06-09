@@ -20,7 +20,7 @@ export const store = reactive<AppStage>(initState);
 
 
 // transform to Observable
-export function useStoreObservable<T extends keyof AppStage>(key: T):Observable<any> {
+export function useStoreObservable<T extends keyof AppStage>(key: T): Observable<any> {
   const stageRef = toRef(store, key);
   const stageRef$ = from(stageRef);
   return stageRef$;
