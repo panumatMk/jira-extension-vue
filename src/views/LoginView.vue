@@ -58,11 +58,11 @@
 
 import { onMounted, onUnmounted, ref } from "vue";
 import { LoginAction } from "@/store/Login";
-import { map, merge, of, ReplaySubject, switchMap, take, takeUntil, timer } from "rxjs";
+import { debounceTime, map, merge, ReplaySubject, switchMap, take, takeUntil, timer } from "rxjs";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { from } from "@vueuse/rxjs";
-import { useGetLocalStorage, useSetLocalStorage } from "@/google/Google";
-import { useStoreObservable } from "@/store/Store";
+import { useGetLocalStorage } from "@/google/Google";
+import { Service } from "@/services/Service";
 
 const host = ref("");
 const username = ref("");
@@ -79,8 +79,7 @@ onMounted(() => {
   useGetLocalStorage([key])
     .pipe(take(1))
     .subscribe((stage: any) => {
-      console.log('set default', stage);
-      const loginStage:Required<LoginStage> = stage?.loginStage;
+      const loginStage: Required<LoginStage> = stage?.loginStage;
       host.value = loginStage.host;
       username.value = loginStage.username;
       password.value = loginStage.password;
@@ -120,9 +119,14 @@ const testConnection = () => {
   const currentClassName = testConnectionBtn.value.$el.children[0].className;
   testConnectionBtn.value.$el.children[0].className = currentClassName + " pi-spin";
 
-  timer(2000).subscribe(() => {
-    onlineStatus.value = true;
-    testConnectionBtn.value.$el.children[0].className = currentClassName;
+  Service.testConnection$()
+    .pipe(
+      debounceTime(1000)
+    ).subscribe({
+    complete: () => {
+      onlineStatus.value = true;
+      testConnectionBtn.value.$el.children[0].className = currentClassName;
+    }
   });
 };
 
