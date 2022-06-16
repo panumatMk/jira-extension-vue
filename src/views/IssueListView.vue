@@ -34,7 +34,7 @@
         <div class="group-header">
           <span>{{ data["id"] }} {{ data["label"] }}</span>
           <span>
-            <Button icon="pi pi-plus" @click="addNewRow(data)"
+            <Button icon="pi pi-plus" @click="addIssue(data)"
                     class="p-button-sm p-button-rounded p-button-success p-button-outlined" />
           </span>
         </div>
@@ -43,11 +43,11 @@
         <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openAddModal" />
       </template>
       <template #empty>
-        No Ticket found.
+        No Issue found.
       </template>
     </DataTable>
 
-    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal"/>
+    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="addIssue"/>
   </div>
 </template>
 
@@ -109,7 +109,7 @@ function closeAddModal(data: boolean){
   openAddDialog.value = data;
 }
 
-function addNewRow({ id, label }: Ticket) {
+function addIssue({ id, label }: Ticket) {
   const newTicket: Ticket = {
     id,
     label,

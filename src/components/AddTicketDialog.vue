@@ -24,7 +24,7 @@ import { Service } from "@/services/Service";
 const jiraId = ref();
 
 const props = defineProps(["display"]);
-const emit = defineEmits(["onCloseModal"]);
+const emit = defineEmits(["onCloseModal", "onAddIssue"]);
 
 function closeModal() {
   emit("onCloseModal", false);
@@ -32,7 +32,11 @@ function closeModal() {
 
 function addTicket() {
   Service.getIssue$(jiraId.value)
-    .subscribe(data => console.log(data));
+    .subscribe({
+      next: (data) => {
+        emit("onAddIssue", { id: data.id, label: data.summary });
+      }
+    });
 }
 </script>
 

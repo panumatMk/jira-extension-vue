@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/logwork',
       name: 'logwork',
-      component: () => import('../views/TicketListView.vue')
+      component: () => import('../views/IssueListView.vue')
     },
     {
       path: '/history',
