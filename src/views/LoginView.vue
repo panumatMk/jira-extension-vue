@@ -80,11 +80,11 @@ onMounted(() => {
     .pipe(take(1))
     .subscribe((stage: any) => {
       const loginStage: Required<LoginStage> = stage?.loginStage;
-      host.value = loginStage.host;
-      username.value = loginStage.username;
-      password.value = loginStage.password;
-      useAccessToken.value = loginStage.useAccessToken;
-      onlineStatus.value = loginStage.online;
+      host.value = loginStage?.host;
+      username.value = loginStage?.username;
+      password.value = loginStage?.password;
+      useAccessToken.value = loginStage?.useAccessToken;
+      onlineStatus.value = loginStage?.online;
     });
 });
 

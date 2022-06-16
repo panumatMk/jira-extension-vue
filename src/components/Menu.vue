@@ -6,18 +6,12 @@ const list = ref<Menu[]>([
   {
     label: "Logwork",
     icon: "pi pi-fw pi-user",
-    to: "/logwork",
-    command: () => {
-      console.log("clicked");
-    }
+    to: "/logwork"
   },
   {
     label: "History",
     icon: "pi pi-fw pi-user",
-    to: "/history",
-    command: () => {
-      console.log("clicked");
-    }
+    to: "/history"
   },
   {
     separator: true

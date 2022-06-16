@@ -8,8 +8,8 @@ export const loginStage: LoginStage = {
   username: "",
   password: "",
   accessToken: "",
-  useAccessToken: undefined,
-  online: undefined
+  useAccessToken: false,
+  online: false
 };
 
 const initState: AppStage = {

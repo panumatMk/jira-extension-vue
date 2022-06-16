@@ -14,6 +14,11 @@ import InputText from "primevue/inputtext";
 import Divider from "primevue/divider";
 import ToggleButton from 'primevue/togglebutton';
 import Button from "primevue/button";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
+import Row from 'primevue/row';
+import Dialog from "primevue/dialog";                     //optional for row
 
 
 const app = createApp(App);
@@ -25,6 +30,11 @@ app.component("TieredMenu", TieredMenu)
   .component("Divider", Divider)
   .component("ToggleButton", ToggleButton)
   .component("Button", Button)
-  .component("InputText", InputText);
+  .component("InputText", InputText)
+  .component("DataTable", DataTable)
+  .component("Column", Column)
+  .component("ColumnGroup", ColumnGroup)
+  .component("Row", Row)
+  .component("Dialog", Dialog)
 
 app.mount("#app");
