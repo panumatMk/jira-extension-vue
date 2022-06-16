@@ -39,7 +39,7 @@ export namespace Service {
       const {response} = data;
       return {
         id: response.key,
-        name: response.field.summary
+        name: response.fields.summary
       }
     }))
   }
