@@ -31,7 +31,8 @@ function closeModal() {
 }
 
 function addTicket() {
-  Service.getIssue$(jiraId.value).subscribe(data => console.log(data));
+  Service.getIssue$(jiraId.value)
+    .subscribe(data => console.log(data));
 }
 </script>
 

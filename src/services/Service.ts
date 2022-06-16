@@ -35,6 +35,12 @@ export namespace Service {
       url: `${loginStage?.host}/${jiraUrl.get_issue.replace('{{issueKey}}', issueKey)}`,
       method: "GET",
       headers: getHeader()
-    }).pipe(map((data: any)=> data))
+    }).pipe(map((data: any)=> {
+      const {response} = data;
+      return {
+        id: response.key,
+        name: response.field.summary
+      }
+    }))
   }
 }
