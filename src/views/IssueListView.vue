@@ -47,7 +47,7 @@
       </template>
     </DataTable>
 
-    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="addIssue"/>
+    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="onAddIssue($event)"/>
   </div>
 </template>
 
@@ -105,11 +105,12 @@ function openAddModal() {
   openAddDialog.value = true;
 }
 
-function closeAddModal(data: boolean){
-  openAddDialog.value = data;
+function closeAddModal(open: boolean){
+  openAddDialog.value = open;
 }
 
 function addIssue({ id, label }: Ticket) {
+  console.log('addIssue');
   const newTicket: Ticket = {
     id,
     label,
@@ -118,6 +119,11 @@ function addIssue({ id, label }: Ticket) {
   };
   list.value = [...list.value || [], newTicket];
   updateTickets$.next(list.value);
+}
+
+function onAddIssue(data: any) {
+  addIssue(data);
+  closeAddModal(false);
 }
 </script>
 

@@ -12,7 +12,7 @@
     </div>
     <template #footer>
       <Button label="Cancel" @click="closeModal" class="p-button-text" />
-      <Button label="Add" @click="addTicket" autofocus />
+      <Button label="Add" @click="addIssue" autofocus />
     </template>
   </Dialog>
 </template>
@@ -30,7 +30,7 @@ function closeModal() {
   emit("onCloseModal", false);
 }
 
-function addTicket() {
+function addIssue() {
   Service.getIssue$(jiraId.value)
     .subscribe({
       next: (data) => {

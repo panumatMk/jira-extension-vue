@@ -1,7 +1,7 @@
 import { store } from "@/store/Store";
 import { ajax } from "rxjs/ajax";
 import { jiraUrl } from "@/services/env";
-import { map } from "rxjs";
+import { map, of } from "rxjs";
 
 function getHeader() {
   let authentication;
