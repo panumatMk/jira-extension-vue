@@ -27,10 +27,10 @@
         </template>
       </Column>
       <Column header="Action" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
-        <template #body="{data}">
+        <template #body="{data,index}">
           <div style="display: flex;gap:7px;">
             <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(data)" />
-            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(data)" />
+            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(index)" />
           </div>
         </template>
       </Column>
@@ -83,7 +83,7 @@ const list = ref<Ticket[]>();
 const openAddDialog = ref(false);
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
-    console.log({tickets});
+    console.log({ tickets });
     list.value = tickets || [];
   });
 });
@@ -116,7 +116,9 @@ function addIssue({ id, label }: Ticket) {
     timeSpent: "",
     comment: ""
   };
+  console.log(1, list.value);
   list.value = [...list.value || [], newTicket];
+  console.log(2, list.value);
   updateTickets$.next(list.value);
 }
 
@@ -140,11 +142,12 @@ function send(data: Ticket) {
   });
 }
 
-function remove(data: Ticket) {
-  console.log('list.value', list.value);
-  list.value = list.value?.filter(value => {
-    return !(value.id === data.id && value.comment === data.comment && value.timeSpent === data.timeSpent);
-  });
+function remove(index: number) {
+  list.value = list.value?.splice(index, 1); // 2nd parameter means remove one item only
+  // console.log("list.value", list.value);
+  // list.value = list.value?.filter(value => {
+  //   return !(value.id === data.id && value.comment === data.comment && value.timeSpent === data.timeSpent);
+  // });
   updateTickets$.next(list.value as Ticket[]);
 }
 
