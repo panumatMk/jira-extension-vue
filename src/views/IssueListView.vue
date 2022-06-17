@@ -83,6 +83,7 @@ const list = ref<Ticket[]>();
 const openAddDialog = ref(false);
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
+    console.log({tickets});
     list.value = tickets;
   });
 });
@@ -174,4 +175,7 @@ function copy() {
 <style lang="sass">
 .swal2-popup
   background-color: #2a323d
+
+.swal2-container
+  z-index: 1200
 </style>
