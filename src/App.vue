@@ -16,7 +16,7 @@ useStoreBehaviorSubject<"loginStage", LoginStage>(key)
     take(1)
   )
   .subscribe((loginStage: any) => {
-    if (!loginStage.online) {
+    if (!loginStage?.online) {
       router.push("/login");
     } else {
       router.push("/logwork");
