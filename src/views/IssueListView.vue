@@ -48,6 +48,7 @@
           <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openAddModal" />
           <span style="display: flex;gap: 5px;align-items: center;">
             <Calendar id="multiple" v-model="dates" selectionMode="multiple" :manualInput="false"
+                      dateFormat="dd/mm/yy"
                       :disabledDays="[0,6]" />
             <Button
               icon="pi pi-copy"
