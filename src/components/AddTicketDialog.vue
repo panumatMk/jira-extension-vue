@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { defineEmits, ref } from "vue";
 import { Service } from "@/services/Service";
+import { SweetAlert } from "@/Utils/Utils";
 const jiraId = ref();
 
 const props = defineProps(["display"]);
@@ -36,6 +37,9 @@ function addIssue() {
       next: (data) => {
         jiraId.value = "";
         emit("onAddIssue", { id: data.id, label: data.summary });
+      },
+      error: () => {
+        SweetAlert.error();
       }
     });
 }

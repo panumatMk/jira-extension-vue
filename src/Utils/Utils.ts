@@ -31,7 +31,7 @@ export namespace Utils {
 }
 
 export namespace DateUtils {
-  export const DATE_VAR = "{{calendarDate}}";
+  export const DATE_VAR = "📅";
 
   export function getSendingDate(date: Date) {
     date.setHours(12, 0, 0, 0);
@@ -53,7 +53,7 @@ export namespace SweetAlert {
     Swal.fire({
       icon: "success",
       timer: 2000,
-      width: 400,
+      width: 3000,
       timerProgressBar: true
     });
   }
@@ -62,7 +62,7 @@ export namespace SweetAlert {
     Swal.fire({
       icon: "error",
       width: 400,
-      timer: 2000,
+      timer: 3000,
       timerProgressBar: true
     });
   }
