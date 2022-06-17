@@ -10,11 +10,11 @@ const list = ref<Menu[]>([
     icon: "pi pi-fw pi-user",
     to: "/logwork"
   },
-  {
-    label: "History",
-    icon: "pi pi-fw pi-user",
-    to: "/history"
-  },
+  // {
+  //   label: "History",
+  //   icon: "pi pi-fw pi-user",
+  //   to: "/history"
+  // },
   {
     separator: true
   },
