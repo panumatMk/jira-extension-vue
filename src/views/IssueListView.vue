@@ -30,7 +30,7 @@
         <template #body="{data,index}">
           <div style="display: flex;gap:7px;">
             <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(data)" />
-            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(index)" />
+            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(data)" />
           </div>
         </template>
       </Column>
@@ -142,9 +142,8 @@ function send(data: Ticket) {
   });
 }
 
-function remove(index: number) {
-  list.value = list.value?.filter((_, i) => index !== i);
-  console.log("list.value", list.value);
+function remove(data: Ticket) {
+  list.value = list.value?.filter((d) => d !== data);
   updateTickets$.next(list.value as Ticket[]);
 }
 
