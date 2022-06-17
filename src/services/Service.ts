@@ -34,19 +34,19 @@ export namespace Service {
   }
 
   export function getIssue$(issueKey: string) {
-    const { loginStage } = store;
-    // return of({ id: issueKey, summary: "sdfdfgtryrtury" });
-    return ajax({
-      url: `${loginStage?.host}/${jiraUrl.get_issue.replace('{{issueKey}}', issueKey)}`,
-      method: "GET",
-      headers: getHeader()
-    }).pipe(map((data: any)=> {
-      const {response} = data;
-      return {
-        id: response.key,
-        summary: response.fields.summary
-      }
-    }))
+    // const { loginStage } = store;
+    return of({ id: issueKey, summary: "sdfdfgtryrtury" });
+    // return ajax({
+    //   url: `${loginStage?.host}/${jiraUrl.get_issue.replace('{{issueKey}}', issueKey)}`,
+    //   method: "GET",
+    //   headers: getHeader()
+    // }).pipe(map((data: any)=> {
+    //   const {response} = data;
+    //   return {
+    //     id: response.key,
+    //     summary: response.fields.summary
+    //   }
+    // }))
   }
 
   export function addWorklogs$(data: Ticket, started: string[]) {
