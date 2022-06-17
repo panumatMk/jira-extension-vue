@@ -14,6 +14,23 @@ export namespace LoginAction {
       useAccessToken: use
     };
   };
+
+  export const updateOnline = (online: boolean) => {
+    store.loginStage = {
+      ...store.loginStage,
+      online
+    };
+    if (online) {
+      useSetLocalStorage({ loginStage: store.loginStage });
+    } else {
+      useSetLocalStorage({
+        loginStage: {
+          ...store.loginStage,
+          online: undefined
+        }
+      });
+    }
+  };
 }
 
 useStoreObservable("loginStage")

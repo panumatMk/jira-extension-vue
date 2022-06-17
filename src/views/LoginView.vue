@@ -58,7 +58,7 @@
 
 import { onMounted, onUnmounted, ref } from "vue";
 import { LoginAction } from "@/store/Login";
-import { debounceTime, map, merge, ReplaySubject, switchMap, takeUntil, timer } from "rxjs";
+import { debounceTime, map, merge, ReplaySubject, switchMap, take, takeUntil, timer } from "rxjs";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { from } from "@vueuse/rxjs";
 import { Service } from "@/services/Service";
@@ -120,11 +120,17 @@ const testConnection = () => {
 
   Service.testConnection$()
     .pipe(
+      take(1),
       debounceTime(1000)
     ).subscribe({
-    complete: () => {
+    next: () => {
       onlineStatus.value = true;
       testConnectionBtn.value.$el.children[0].className = currentClassName;
+      LoginAction.updateOnline(true);
+    }, error: () => {
+      onlineStatus.value = false;
+      testConnectionBtn.value.$el.children[0].className = currentClassName;
+      LoginAction.updateOnline(false);
     }
   });
 };

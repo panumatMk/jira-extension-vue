@@ -21,6 +21,8 @@ import Row from 'primevue/row';
 import Dialog from "primevue/dialog";                   //optional for row
 import Calendar from 'primevue/calendar';
 import Tooltip from 'primevue/tooltip';
+import ToastService from 'primevue/toastservice';
+import Toast from 'primevue/toast';
 
 
 const app = createApp(App);
@@ -39,7 +41,9 @@ app.component("TieredMenu", TieredMenu)
   .component("Row", Row)
   .component("Dialog", Dialog)
   .component("Calendar", Calendar)
+  .component("Toast", Toast)
 
+app.use(ToastService);
 app.directive('tooltip', Tooltip);
 
 app.mount("#app");

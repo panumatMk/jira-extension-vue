@@ -3,15 +3,25 @@ import Menu from "./components/Menu.vue";
 import { RouterView, useRoute } from "vue-router";
 import { computed } from "vue";
 import router from "@/router";
-import { store } from "@/store/Store";
+import { useStoreBehaviorSubject } from "@/store/Store";
+import type { AppStage, LoginStage } from "@/models/StageInterface";
+import { debounceTime, take } from "rxjs";
 
 const route = useRoute();
 
-// if (!store.loginStage?.online) {
-//   router.push("/login");
-// }else{
-  router.push("/logwork");
-// }
+const key: keyof AppStage = "loginStage";
+useStoreBehaviorSubject<"loginStage", LoginStage>(key)
+  .pipe(
+    debounceTime(200),
+    take(1)
+  )
+  .subscribe((loginStage: any) => {
+    if (!loginStage.online) {
+      router.push("/login");
+    } else {
+      router.push("/logwork");
+    }
+  });
 
 const path = computed(() => {
   switch (route.fullPath) {

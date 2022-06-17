@@ -10,7 +10,7 @@ export const loginStage: LoginStage = {
   password: "",
   accessToken: "",
   useAccessToken: false,
-  online: false
+  online: undefined
 };
 
 const initState: AppStage = {

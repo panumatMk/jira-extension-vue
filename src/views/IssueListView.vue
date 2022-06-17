@@ -36,7 +36,7 @@
       </Column>
       <template #groupheader="{data}">
         <div class="group-header">
-          <span>{{ data["id"] }} {{ data["label"] }}</span>
+          <span>[{{ data["id"] }}] {{ data["label"] }}</span>
           <span>
             <Button icon="pi pi-plus" @click="addIssue(data)"
                     class="p-button-sm p-button-rounded p-button-success p-button-outlined" />
@@ -74,6 +74,7 @@ import { DateUtils, JIRA, Utils } from "@/Utils/Utils";
 import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
 import { Service } from "@/services/Service";
+import { useToast } from "primevue/usetoast";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
