@@ -173,9 +173,15 @@ function copy() {
 </style>
 
 <style lang="sass">
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&family=Poppins:wght@300&display=swap')
 .swal2-popup
   background-color: #2a323d
 
 .swal2-container
   z-index: 1200
+
+.swal2-title
+  font-family: 'Kanit', sans-serif
+  font-family: 'Poppins', sans-serif
+  color: white
 </style>
