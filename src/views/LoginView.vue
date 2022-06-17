@@ -63,6 +63,7 @@ import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { from } from "@vueuse/rxjs";
 import { Service } from "@/services/Service";
 import { useStoreBehaviorSubject, useStoreObservable } from "@/store/Store";
+import { SweetAlert } from "@/Utils/Utils";
 
 const host = ref("");
 const username = ref("");
@@ -124,10 +125,12 @@ const testConnection = () => {
       debounceTime(1000)
     ).subscribe({
     next: () => {
+      SweetAlert.success();
       onlineStatus.value = true;
       testConnectionBtn.value.$el.children[0].className = currentClassName;
       LoginAction.updateOnline(true);
     }, error: () => {
+      SweetAlert.error();
       onlineStatus.value = false;
       testConnectionBtn.value.$el.children[0].className = currentClassName;
       LoginAction.updateOnline(false);
@@ -137,6 +140,11 @@ const testConnection = () => {
 
 
 </script>
+
+<style lang="sass">
+.swal2-popup
+  background-color: #2a323d
+</style>
 
 <style scoped lang="sass">
 .container

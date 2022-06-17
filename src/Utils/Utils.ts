@@ -1,6 +1,7 @@
 import { useGetLocalStorage, useSetLocalStorage } from "@/google/Google";
 import { map, Observable, take } from "rxjs";
-import moment from 'moment';
+import moment from "moment";
+import Swal from "sweetalert2";
 
 export interface Ticket {
   id: string,
@@ -30,18 +31,39 @@ export namespace Utils {
 }
 
 export namespace DateUtils {
-  export const DATE_VAR = "{{calendarDate}}"
+  export const DATE_VAR = "{{calendarDate}}";
+
   export function getSendingDate(date: Date) {
     date.setHours(12, 0, 0, 0);
     const dateString = date.toISOString();
-    return dateString.replace('Z', '+0000');
+    return dateString.replace("Z", "+0000");
   }
 
-  export function getSendingDates(dates: Date[]){
+  export function getSendingDates(dates: Date[]) {
     return dates.map(date => getSendingDate(date));
   }
 
-  export function getCommentDate(value:string){
-    return moment(String(value)).format('MM/DD/YYYY')
+  export function getCommentDate(value: string) {
+    return moment(String(value)).format("MM/DD/YYYY");
+  }
+}
+
+export namespace SweetAlert {
+  export function success() {
+    Swal.fire({
+      icon: "success",
+      timer: 2000,
+      width: 400,
+      timerProgressBar: true
+    });
+  }
+
+  export function error() {
+    Swal.fire({
+      icon: "error",
+      width: 400,
+      timer: 2000,
+      timerProgressBar: true
+    });
   }
 }

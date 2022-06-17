@@ -70,7 +70,7 @@ export namespace Service {
       body: payload
     }).pipe(map((data: any) => {
       const { response } = data;
-      return data;
+      return response;
     }));
   }
 }

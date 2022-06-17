@@ -70,7 +70,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import type { Ticket } from "@/Utils/Utils";
-import { DateUtils, JIRA, Utils } from "@/Utils/Utils";
+import { DateUtils, JIRA, SweetAlert, Utils } from "@/Utils/Utils";
 import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
 import { Service } from "@/services/Service";
@@ -128,8 +128,14 @@ function send(data: Ticket) {
   iif(() => dates.value.length === 1,
     Service.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
     Service.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
-  ).subscribe((results) => {
-    console.log(results);
+  ).subscribe({
+    next: (results) => {
+      console.log(results);
+      SweetAlert.success();
+    },
+    error: () => {
+      SweetAlert.error();
+    }
   });
 }
 
@@ -163,4 +169,9 @@ function copy() {
   justify-content: space-between
   align-items: center
 
+</style>
+
+<style lang="sass">
+.swal2-popup
+  background-color: #2a323d
 </style>
