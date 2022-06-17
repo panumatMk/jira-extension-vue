@@ -31,9 +31,9 @@ onMounted(() => {
   useStoreBehaviorSubject<"loginStage", LoginStage>(key)
     .subscribe((loginStage: any) => {
       let color;
-      if (loginStage.online === undefined) {
+      if (loginStage?.online === undefined) {
         color = "rgba(255, 255, 255, 0.6)";
-      } else if (loginStage.online) {
+      } else if (loginStage?.online) {
         color = "rgb(0 255 0 / 80%)";
       } else {
         color = "rgb(255 0 0 / 80%)";
