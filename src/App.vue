@@ -7,11 +7,11 @@ import { store } from "@/store/Store";
 
 const route = useRoute();
 
-if (store.loginStage?.online) {
-  router.push("/login");
-}else{
+// if (!store.loginStage?.online) {
+//   router.push("/login");
+// }else{
   router.push("/logwork");
-}
+// }
 
 const path = computed(() => {
   switch (route.fullPath) {

@@ -20,13 +20,13 @@
 <script setup lang="ts">
 import { defineEmits, ref } from "vue";
 import { Service } from "@/services/Service";
-
 const jiraId = ref();
 
 const props = defineProps(["display"]);
 const emit = defineEmits(["onCloseModal", "onAddIssue"]);
 
 function closeModal() {
+  jiraId.value = "";
   emit("onCloseModal", false);
 }
 
@@ -34,6 +34,7 @@ function addIssue() {
   Service.getIssue$(jiraId.value)
     .subscribe({
       next: (data) => {
+        jiraId.value = "";
         emit("onAddIssue", { id: data.id, label: data.summary });
       }
     });

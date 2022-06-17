@@ -58,11 +58,11 @@
 
 import { onMounted, onUnmounted, ref } from "vue";
 import { LoginAction } from "@/store/Login";
-import { debounceTime, map, merge, ReplaySubject, switchMap, take, takeUntil, timer } from "rxjs";
+import { debounceTime, map, merge, ReplaySubject, switchMap, takeUntil, timer } from "rxjs";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { from } from "@vueuse/rxjs";
-import { useGetLocalStorage } from "@/google/Google";
 import { Service } from "@/services/Service";
+import { useStoreBehaviorSubject, useStoreObservable } from "@/store/Store";
 
 const host = ref("");
 const username = ref("");
@@ -73,16 +73,15 @@ const onlineStatus = ref(false);
 let testConnectionBtn = ref();
 const destroy$ = new ReplaySubject<void>();
 
-
 onMounted(() => {
   const key: keyof AppStage = "loginStage";
-  useGetLocalStorage([key])
-    .pipe(take(1))
-    .subscribe((stage: any) => {
-      const loginStage: Required<LoginStage> = stage?.loginStage;
+  useStoreBehaviorSubject<"loginStage", LoginStage>(key)
+    .subscribe((loginStage: any) => {
+      console.log("useStoreObservable");
       host.value = loginStage?.host;
       username.value = loginStage?.username;
       password.value = loginStage?.password;
+      accessToken.value = loginStage?.accessToken;
       useAccessToken.value = loginStage?.useAccessToken;
       onlineStatus.value = loginStage?.online;
     });

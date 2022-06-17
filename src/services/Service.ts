@@ -1,19 +1,22 @@
 import { store } from "@/store/Store";
 import { ajax } from "rxjs/ajax";
 import { jiraUrl } from "@/services/env";
-import { map, of } from "rxjs";
+import { forkJoin, map, of } from "rxjs";
+import type { Ticket } from "@/Utils/Utils";
+import { DateUtils } from "@/Utils/Utils";
 
 function getHeader() {
   let authentication;
   const { loginStage } = store;
   if (loginStage?.useAccessToken) {
     authentication = { ["app_token"]: loginStage.accessToken };
-  }else {
+  } else {
     const b64 = btoa(`${loginStage?.username}:${loginStage?.password}`);
-    authentication = { ["Authorization"]: `Basic ${b64}`}
+    authentication = { ["Authorization"]: `Basic ${b64}` };
   }
   return {
-    "content-type": "application/json",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
     "cache-control": "no-cache",
     "Access-Control-Allow-Origin": "*",
     ...authentication
@@ -29,8 +32,10 @@ export namespace Service {
       headers: getHeader()
     });
   }
-  export function getIssue$(issueKey: string){
+
+  export function getIssue$(issueKey: string) {
     const { loginStage } = store;
+    // return of({ id: issueKey, summary: "sdfdfgtryrtury" });
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.get_issue.replace('{{issueKey}}', issueKey)}`,
       method: "GET",
@@ -42,5 +47,30 @@ export namespace Service {
         summary: response.fields.summary
       }
     }))
+  }
+
+  export function addWorklogs$(data: Ticket, started: string[]) {
+    const addLogs$ = started.map(date => {
+      return addWorklog$(data, date);
+    });
+    return forkJoin(addLogs$);
+  }
+
+  export function addWorklog$(data: Ticket, started: string) {
+    const { loginStage } = store;
+    const payload = {
+      comment: data.comment.replace(DateUtils.DATE_VAR, DateUtils.getCommentDate(started)),
+      timeSpent: data.timeSpent,
+      started
+    };
+    return ajax({
+      url: `${loginStage?.host}/${jiraUrl.post_worklog.replace("{{issueKey}}", data.id)}`,
+      method: "POST",
+      headers: getHeader(),
+      body: payload
+    }).pipe(map((data: any) => {
+      const { response } = data;
+      return data;
+    }));
   }
 }

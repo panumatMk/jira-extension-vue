@@ -18,7 +18,9 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 import Row from 'primevue/row';
-import Dialog from "primevue/dialog";                     //optional for row
+import Dialog from "primevue/dialog";                   //optional for row
+import Calendar from 'primevue/calendar';
+import Tooltip from 'primevue/tooltip';
 
 
 const app = createApp(App);
@@ -36,5 +38,8 @@ app.component("TieredMenu", TieredMenu)
   .component("ColumnGroup", ColumnGroup)
   .component("Row", Row)
   .component("Dialog", Dialog)
+  .component("Calendar", Calendar)
+
+app.directive('tooltip', Tooltip);
 
 app.mount("#app");

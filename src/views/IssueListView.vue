@@ -14,20 +14,24 @@
       sortMode="single"
       :sortOrder="1"
     >
-      <Column :rowReorder="true" headerStyle="width: 1rem"/>
-      <Column field="timeSpent" header="timeSpent">
+      <Column :rowReorder="true" headerStyle="max-width: 50px" bodyStyle="max-width: 50px;justify-content:center" />
+      <Column field="timeSpent" header="timeSpent" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
         <template #editor="{ data, field }">
-          <InputText v-model="data[field]" autofocus />
+          <InputText v-model="data[field]" autofocus style="max-width: 100px" />
         </template>
       </Column>
-      <Column field="comment" header="Comment" style="width: 100px;">
+      <Column field="comment" header="Comment" headerStyle="max-width: 252px"
+              bodyStyle="max-width: 252px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis">
         <template #editor="{ data, field }">
-          <InputText v-model="data[field]" autofocus />
+          <InputText v-model="data[field]" autofocus style="width: 100%" />
         </template>
       </Column>
-      <Column header="Action">
+      <Column header="Action" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
         <template #body="{data}">
-          {{ "test" }}
+          <div style="display: flex;gap:7px;">
+            <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(data)" />
+            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(data)" />
+          </div>
         </template>
       </Column>
       <template #groupheader="{data}">
@@ -40,55 +44,45 @@
         </div>
       </template>
       <template #footer>
-        <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openAddModal" />
+        <div style="display: flex;gap: 15px;}">
+          <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openAddModal" />
+          <span style="display: flex;gap: 5px;align-items: center;">
+            <Calendar id="multiple" v-model="dates" selectionMode="multiple" :manualInput="false"
+                      :disabledDays="[0,6]" />
+            <Button
+              icon="pi pi-copy"
+              class="p-button-rounded p-button-warning"
+              v-tooltip.top="{value:'Copy Dates', class: 'copy-tooltip'}"
+              @click="copy"
+            />
+          </span>
+        </div>
       </template>
       <template #empty>
         No Issue found.
       </template>
     </DataTable>
 
-    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="onAddIssue($event)"/>
+    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="onAddIssue($event)" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import type { Ticket } from "@/Utils/Utils";
-import { JIRA } from "@/Utils/Utils";
-import { Subject } from "rxjs";
+import { DateUtils, JIRA, Utils } from "@/Utils/Utils";
+import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
+import { Service } from "@/services/Service";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
-
+const dates = ref([new Date()]);
 const list = ref<Ticket[]>();
 const openAddDialog = ref(false);
 onMounted(() => {
-  list.value = [
-    {
-      id: "AG-123",
-      label: "Edit",
-      timeSpent: "15m",
-      comment: "124234234"
-    },
-    {
-      id: "AG-123",
-      label: "Edit",
-      timeSpent: "15m",
-      comment: "124234234"
-    },
-    {
-      id: "BO-xxx",
-      label: "Update",
-      timeSpent: "15m",
-      comment: "124234234"
-    }
-  ];
-
   JIRA.getTickets().subscribe((tickets) => {
-    if (tickets !== undefined) {
-      list.value = tickets;
-    }
+    list.value = tickets;
   });
 });
 
@@ -97,7 +91,10 @@ const onRowReorder = (event: any) => {
   updateTickets$.next(event.value as Ticket[]);
 };
 
-function onCellEditComplete() {
+function onCellEditComplete(event: any) {
+  let { data, newValue, field } = event;
+  console.log(data, newValue, field);
+  data[field] = newValue;
   updateTickets$.next(list.value as Ticket[]);
 }
 
@@ -105,12 +102,12 @@ function openAddModal() {
   openAddDialog.value = true;
 }
 
-function closeAddModal(open: boolean){
+function closeAddModal(open: boolean) {
   openAddDialog.value = open;
 }
 
 function addIssue({ id, label }: Ticket) {
-  console.log('addIssue');
+  console.log("addIssue");
   const newTicket: Ticket = {
     id,
     label,
@@ -125,11 +122,38 @@ function onAddIssue(data: any) {
   addIssue(data);
   closeAddModal(false);
 }
+
+function send(data: Ticket) {
+  iif(() => dates.value.length === 1,
+    Service.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
+    Service.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
+  ).subscribe((results) => {
+    console.log(results);
+  });
+}
+
+function remove(data: Ticket) {
+  console.log(data);
+  list.value = list.value?.filter(value => {
+    return !(value.id === data.id && value.comment === data.comment && value.timeSpent === data.timeSpent);
+  });
+  updateTickets$.next(list.value as Ticket[]);
+}
+
+function copy() {
+  Utils.copyToClipboard(DateUtils.DATE_VAR);
+}
 </script>
 
 <style scoped lang="sass">
-::v-deep .p-rowgroup-header>td
-  padding: 0.5rem 1rem !important
+::v-deep
+  .p-button.p-button-icon-only.p-button-rounded
+    width: 1.7rem
+    height: 1.7rem
+
+  .p-datatable-scrollable .p-datatable-thead > tr > th
+    justify-content: center
+
 
 .group-header
   width: 100%
