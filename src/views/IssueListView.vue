@@ -143,11 +143,8 @@ function send(data: Ticket) {
 }
 
 function remove(index: number) {
-  list.value = list.value?.splice(index, 1); // 2nd parameter means remove one item only
-  // console.log("list.value", list.value);
-  // list.value = list.value?.filter(value => {
-  //   return !(value.id === data.id && value.comment === data.comment && value.timeSpent === data.timeSpent);
-  // });
+  list.value = list.value?.filter((_, i) => index !== i);
+  console.log("list.value", list.value);
   updateTickets$.next(list.value as Ticket[]);
 }
 
