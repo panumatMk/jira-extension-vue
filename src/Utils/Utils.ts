@@ -58,11 +58,12 @@ export namespace SweetAlert {
     });
   }
 
-  export function error() {
+  export function error(title: string) {
     Swal.fire({
       icon: "error",
+      title,
       width: 400,
-      timer: 3000,
+      // timer: 3000,
       timerProgressBar: true
     });
   }
