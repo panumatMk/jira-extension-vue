@@ -9,7 +9,7 @@
   "permissions": [
     "storage"
   ],
-  "host_permission": [
+  "host_permissions": [
     "*://*/*"
   ]
 }
