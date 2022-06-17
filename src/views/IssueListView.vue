@@ -140,7 +140,7 @@ function send(data: Ticket) {
 }
 
 function remove(data: Ticket) {
-  console.log(data);
+  console.log('list.value', list.value);
   list.value = list.value?.filter(value => {
     return !(value.id === data.id && value.comment === data.comment && value.timeSpent === data.timeSpent);
   });
