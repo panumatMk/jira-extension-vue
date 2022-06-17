@@ -1,4 +1,4 @@
-import { useGetLocalStorage, useSetLocalStorage } from "@/google/Google";
+import { useGetLocalStorage, useRemoveLocalStorage, useSetLocalStorage } from "@/google/Google";
 import { map, Observable, take } from "rxjs";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -20,6 +20,10 @@ export namespace JIRA {
   }
 
   export function updateTickets(data: Ticket[]) {
+    if(!data){
+      useRemoveLocalStorage(['tickets']).subscribe()
+      return;
+    }
     useSetLocalStorage({ tickets: data }).subscribe();
   }
 }

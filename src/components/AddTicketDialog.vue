@@ -51,7 +51,10 @@ function addIssue() {
 .swal2-popup
   background-color: #2a323d
 
-.swal2-title
+.swal2-container
+  z-index: 1200
+
+.swal2-title, .swal2-html-container
   font-family: 'Kanit', sans-serif
   font-family: 'Poppins', sans-serif
   color: white

@@ -83,8 +83,7 @@ const list = ref<Ticket[]>();
 const openAddDialog = ref(false);
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
-    console.log({ tickets });
-    list.value = tickets || [];
+    list.value = tickets ? Object.values(tickets) : [];
   });
 });
 
@@ -136,8 +135,8 @@ function send(data: Ticket) {
       console.log(results);
       SweetAlert.success();
     },
-    error: () => {
-      SweetAlert.error();
+    error: (err) => {
+      SweetAlert.error(err.status);
     }
   });
 }
