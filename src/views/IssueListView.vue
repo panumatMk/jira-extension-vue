@@ -84,7 +84,7 @@ const openAddDialog = ref(false);
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
     console.log({tickets});
-    list.value = tickets;
+    list.value = tickets || [];
   });
 });
 

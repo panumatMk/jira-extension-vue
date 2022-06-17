@@ -52,7 +52,7 @@ export namespace SweetAlert {
   export function success() {
     Swal.fire({
       icon: "success",
-      timer: 2000,
+      timer: 400,
       width: 3000,
       timerProgressBar: true
     });
