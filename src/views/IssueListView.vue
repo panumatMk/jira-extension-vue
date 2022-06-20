@@ -36,7 +36,8 @@
       </Column>
       <template #groupheader="{data}">
         <div class="group-header">
-          <span>[{{ data["id"] }}] {{ data["label"] }}</span>
+          <span>
+            <a :href="host+'/browse/'+data['id']" target="_blank" style="color: white">[{{ data["id"] }}]</a> {{ data["label"] }}</span>
           <span>
             <Button icon="pi pi-plus" @click="addIssue(data)"
                     class="p-button-sm p-button-rounded p-button-success p-button-outlined" />
@@ -81,6 +82,7 @@ const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
 const dates = ref([new Date()]);
 const list = ref<Ticket[]>();
+const host = toRef(store.loginStage, "host");
 const openAddDialog = ref(false);
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
