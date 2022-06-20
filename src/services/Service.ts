@@ -4,9 +4,8 @@ import { jiraUrl } from "@/services/env";
 import { forkJoin, map, Observable, of, switchMap, tap } from "rxjs";
 import type { Ticket } from "@/Utils/Utils";
 import { DateUtils } from "@/Utils/Utils";
-import moment from "moment";
 
-function getHeader() {
+export function getHeader() {
   let authentication;
   const { loginStage } = store;
   if (loginStage?.useAccessToken) {
@@ -24,73 +23,6 @@ function getHeader() {
   };
 }
 
-interface Issue {
-  key: string,
-  summary: string,
-  worklogIds: string[]
-}
-
-function getWorklogsIssuesByDate(date: string): Observable<{ issues: Issue[] }> {
-  const { loginStage } = store;
-  const jql = `jql=worklogDate = '${date}' AND worklogAuthor = currentUser()`;
-  return ajax({
-    url: `${loginStage?.host}/${jiraUrl.get_search}?${jql}`,
-    method: "GET",
-    headers: getHeader()
-  }).pipe(
-    map(result => {
-      const { response } = result;
-      return {
-        issues: (response as any)?.issues?.map((issue: any) => ({
-          key: issue.key,
-          summary: issue.fields.summary
-        }))
-      };
-    })
-  );
-}
-
-function getWorklogs(issueKey: string, date: string) {
-  const { loginStage } = store;
-  return ajax({
-    url: `${loginStage?.host}/${jiraUrl.get_worklog.replace("{{issueKey}}", issueKey)}`,
-    method: "GET",
-    headers: getHeader()
-  }).pipe(
-    map(result => {
-      const { response } = result;
-      const worklogs = (response as any)?.worklogs?.filter((worklog: any) => {
-        const startedDate = moment(new Date(worklog.started)).format("YYYY/MM/DD");
-        console.log(date, startedDate);
-        return date === startedDate;
-      });
-      return { worklogIds: worklogs.map((w: any) => w.id) };
-    })
-  );
-}
-
-export function getAllWorklog() {
-  const currentDate = new Date();
-  const worklogDate = moment(currentDate).format("YYYY/MM/DD");
-  return getWorklogsIssuesByDate(worklogDate)
-    .pipe(
-      switchMap(({ issues }) => {
-        console.log("issues", issues);
-        if (issues.length > 0) {
-          console.log("in > 0");
-          const queryList = issues.map((issue) => {
-            return getWorklogs(issue.key, worklogDate)
-              .pipe(
-                map(({ worklogIds }) => ({ ...issue, worklogIds })
-                )
-              );
-          });
-          return forkJoin(queryList);
-        }
-        return of([]);
-      })
-    );
-}
 
 function getCurrentUser() {
   const { loginStage } = store;
@@ -108,16 +40,17 @@ export namespace Service {
       url: `${loginStage?.host}/${jiraUrl.get_all_dashboard}`,
       method: "GET",
       headers: getHeader()
-    }).pipe(
-      switchMap(() => getCurrentUser()
-        .pipe(
-          tap((data => {
-            console.log('testConnection$', data);
-            store.mySelf.name = data?.name;
-          }))
+    })
+      .pipe(
+        switchMap(() => getCurrentUser()
+          .pipe(
+            tap(({ response }) => {
+              console.log("testConnection$", response);
+              store.mySelf.name = response?.name;
+            })
+          )
         )
-      )
-    );
+      );
   }
 
   export function getIssue$(issueKey: string) {
