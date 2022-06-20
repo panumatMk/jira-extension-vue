@@ -66,7 +66,7 @@ function getWorklogs(issueKey: string, date: string) {
 export function getAllWorklog() {
   const currentDate = new Date();
   const worklogDate = moment(currentDate).format("YYYY/MM/DD");
-  getWorklogsIssuesByDate(worklogDate)
+  return getWorklogsIssuesByDate(worklogDate)
     .pipe(
       switchMap(({ issues }) => {
         if (issues.length > 0) {
