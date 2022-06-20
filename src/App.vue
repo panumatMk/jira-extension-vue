@@ -9,31 +9,28 @@ import { catchError, debounceTime, EMPTY, switchMap, take, tap } from "rxjs";
 import { Service } from "@/services/Service";
 
 const route = useRoute();
-
-router.push("/history");
-
-// const key: keyof AppStage = "loginStage";
-// useStoreBehaviorSubject<"loginStage", LoginStage>(key)
-//   .pipe(
-//     debounceTime(200),
-//     take(1),
-//     switchMap((loginStage: any) => {
-//       if (!loginStage?.host || !loginStage?.online) {
-//         router.push("/login");
-//         return EMPTY;
-//       } else {
-//         router.push("/logwork")
-//         return Service.testConnection$()
-//           .pipe(
-//             catchError(() => {
-//               router.push("/login");
-//               return EMPTY;
-//             })
-//           );
-//       }
-//     })
-//   )
-//   .subscribe();
+const key: keyof AppStage = "loginStage";
+useStoreBehaviorSubject<"loginStage", LoginStage>(key)
+  .pipe(
+    debounceTime(200),
+    take(1),
+    switchMap((loginStage: any) => {
+      if (!loginStage?.host || !loginStage?.online) {
+        router.push("/login");
+        return EMPTY;
+      } else {
+        router.push("/logwork")
+        return Service.testConnection$()
+          .pipe(
+            catchError(() => {
+              router.push("/login");
+              return EMPTY;
+            })
+          );
+      }
+    })
+  )
+  .subscribe();
 
 const path = computed(() => {
   switch (route.fullPath) {
