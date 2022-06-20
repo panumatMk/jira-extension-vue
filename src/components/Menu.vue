@@ -12,7 +12,7 @@ const list = ref<Menu[]>([
   },
   {
     label: "History",
-    icon: "pi pi-fw pi-user",
+    icon: "pi pi-fw pi-history",
     to: "/history"
   },
   {
