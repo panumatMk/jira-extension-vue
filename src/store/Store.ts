@@ -1,4 +1,4 @@
-import type { AppStage, LoginStage } from "@/models/StageInterface";
+import type { AppStage, LoginStage, MySelf } from "@/models/StageInterface";
 import { reactive, toRef } from "vue";
 import { from } from "@vueuse/rxjs";
 import { BehaviorSubject, Observable, take } from "rxjs";
@@ -13,8 +13,13 @@ export const loginStage: LoginStage = {
   online: undefined
 };
 
+export const mySelf: MySelf = {
+  name: ''
+}
+
 const initState: AppStage = {
-  loginStage
+  loginStage,
+  mySelf
 };
 
 export const store = reactive<AppStage>(initState);

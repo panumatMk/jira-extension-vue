@@ -6,6 +6,7 @@ import router from "@/router";
 import { useStoreBehaviorSubject } from "@/store/Store";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
 import { debounceTime, take } from "rxjs";
+import { Service } from "@/services/Service";
 
 const route = useRoute();
 
@@ -22,6 +23,8 @@ useStoreBehaviorSubject<"loginStage", LoginStage>(key)
       router.push("/logwork");
     }
   });
+
+Service.testConnection$().subscribe();
 
 const path = computed(() => {
   switch (route.fullPath) {

@@ -1,7 +1,7 @@
 import { store } from "@/store/Store";
 import { ajax } from "rxjs/ajax";
 import { jiraUrl } from "@/services/env";
-import { forkJoin, map, Observable, of, switchMap } from "rxjs";
+import { forkJoin, map, Observable, of, switchMap, tap } from "rxjs";
 import type { Ticket } from "@/Utils/Utils";
 import { DateUtils } from "@/Utils/Utils";
 import moment from "moment";
@@ -32,7 +32,7 @@ interface Issue {
 
 function getWorklogsIssuesByDate(date: string): Observable<{ issues: Issue[] }> {
   const { loginStage } = store;
-  const jql = `jql = worklogDate = '${date}' AND worklogAuthor = currentUser()`;
+  const jql = `jql=worklogDate = '${date}' AND worklogAuthor = currentUser()`;
   return ajax({
     url: `${loginStage?.host}/${jiraUrl.get_search}?${jql}`,
     method: "GET",
@@ -40,7 +40,12 @@ function getWorklogsIssuesByDate(date: string): Observable<{ issues: Issue[] }> 
   }).pipe(
     map(result => {
       const { response } = result;
-      return { issues: (response as any)?.issues?.map((issue: any) => ({ key: issue.key, summary: issue.summary })) };
+      return {
+        issues: (response as any)?.issues?.map((issue: any) => ({
+          key: issue.key,
+          summary: issue.fields.summary
+        }))
+      };
     })
   );
 }
@@ -55,7 +60,8 @@ function getWorklogs(issueKey: string, date: string) {
     map(result => {
       const { response } = result;
       const worklogs = (response as any)?.worklogs?.filter((worklog: any) => {
-        const startedDate = moment(new Date(worklog.started)).format("YYYY-MM-DD");
+        const startedDate = moment(new Date(worklog.started)).format("YYYY/MM/DD");
+        console.log(date, startedDate);
         return date === startedDate;
       });
       return { worklogIds: worklogs.map((w: any) => w.id) };
@@ -69,7 +75,9 @@ export function getAllWorklog() {
   return getWorklogsIssuesByDate(worklogDate)
     .pipe(
       switchMap(({ issues }) => {
+        console.log("issues", issues);
         if (issues.length > 0) {
+          console.log("in > 0");
           const queryList = issues.map((issue) => {
             return getWorklogs(issue.key, worklogDate)
               .pipe(
@@ -77,10 +85,20 @@ export function getAllWorklog() {
                 )
               );
           });
+          return forkJoin(queryList);
         }
         return of([]);
       })
     );
+}
+
+function getCurrentUser() {
+  const { loginStage } = store;
+  return ajax({
+    url: `${loginStage?.host}/${jiraUrl.get_myself}`,
+    method: "GET",
+    headers: getHeader()
+  }).pipe((map(data => ({ response: data.response }))));
 }
 
 export namespace Service {
@@ -90,7 +108,16 @@ export namespace Service {
       url: `${loginStage?.host}/${jiraUrl.get_all_dashboard}`,
       method: "GET",
       headers: getHeader()
-    });
+    }).pipe(
+      switchMap(() => getCurrentUser()
+        .pipe(
+          tap((data => {
+            console.log('testConnection$', data);
+            store.mySelf.name = data?.name;
+          }))
+        )
+      )
+    );
   }
 
   export function getIssue$(issueKey: string) {
