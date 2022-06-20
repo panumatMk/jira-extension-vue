@@ -26,6 +26,7 @@ import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import Carousel from 'primevue/carousel';
+import Fieldset from 'primevue/fieldset';
 
 
 const app = createApp(App);
@@ -46,6 +47,8 @@ app.component("TieredMenu", TieredMenu)
   .component("Calendar", Calendar)
   .component("Toast", Toast)
   .component("Carousel", Carousel)
+  .component("Fieldset", Fieldset)
+
 
 app.use(VueSweetalert2);
 app.use(ToastService);
