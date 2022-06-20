@@ -5,18 +5,32 @@ import { jiraUrl } from "@/services/env";
 import moment from "moment";
 import { getHeader } from "@/services/Service";
 
-export namespace HistoryServices {
-  interface Issue {
-    key: string;
-    summary: string;
-    worklogId?: string[];
-    date?: string;
-    dayOfWeek: number;
-  }
+interface Issue {
+  key: string;
+  summary: string;
+  worklogId?: string[];
+  date?: string;
+  dayOfWeek: number;
+}
 
+function getAllDateOfWeek() {
+  let allDateOfWeek = [];
+  const weekDays = moment.weekdays();
+  const firstDateOfWeek = moment().startOf("week");
+  for (let i = 1; i < 6; i++) {
+    allDateOfWeek.push({
+      day: firstDateOfWeek.day(i).toDate(),
+      dayOfWeek: weekDays[i]
+    });
+  }
+  return allDateOfWeek;
+}
+
+
+export namespace HistoryServices {
   function getWorklogsIssuesByDate(date: Date): Observable<{ issues: Issue[] }> {
-    console.log('day', moment(date).day());
-    const dateString = moment(date).format("YYYY/MM/DD")
+    console.log("day", moment(date).day());
+    const dateString = moment(date).format("YYYY/MM/DD");
     const { loginStage } = store;
     const jql = `jql=worklogDate = '${dateString}' AND worklogAuthor = currentUser()`;
     return ajax({
@@ -30,7 +44,7 @@ export namespace HistoryServices {
           issues: (response as any)?.issues?.map((issue: any) => ({
             key: issue.key,
             summary: issue.fields.summary,
-            date: date,
+            date: date
           }))
         };
       })
@@ -38,7 +52,7 @@ export namespace HistoryServices {
   }
 
   function getWorklogs(issueKey: string, date: Date) {
-    const dateString = moment(date).format("YYYY/MM/DD")
+    const dateString = moment(date).format("YYYY/MM/DD");
     const { loginStage } = store;
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.get_worklog.replace("{{issueKey}}", issueKey)}`,
@@ -56,14 +70,13 @@ export namespace HistoryServices {
     );
   }
 
-  export function getAllWorklog() {
-    const currentDate = new Date();
-    return getWorklogsIssuesByDate(currentDate)
+  function getWorklogsByDate(date: Date) {
+    return getWorklogsIssuesByDate(date)
       .pipe(
         switchMap(({ issues }) => {
           if (issues.length > 0) {
             const queryList = issues.map((issue) => {
-              return getWorklogs(issue.key, currentDate)
+              return getWorklogs(issue.key, date)
                 .pipe(
                   map(({ worklogIds }) => {
                     return worklogIds.map((worklogId) => ({ ...issue, worklogId }));
@@ -78,5 +91,16 @@ export namespace HistoryServices {
           return arr.flat(2);
         })
       );
+  }
+
+  export function getAllWorklogsOfWeek() {
+    const dates = getAllDateOfWeek();
+    const list = dates.reduce((total, date) => {
+      return {
+        ...total,
+        [date.dayOfWeek]: getWorklogsByDate(date.day)
+      };
+    }, {});
+    return forkJoin(list);
   }
 }
