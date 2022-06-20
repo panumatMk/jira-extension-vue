@@ -70,13 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, toRef } from "vue";
 import type { Ticket } from "@/Utils/Utils";
 import { DateUtils, JIRA, SweetAlert, Utils } from "@/Utils/Utils";
 import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
 import { Service } from "@/services/Service";
-import { useToast } from "primevue/usetoast";
+import { store } from "@/store/Store";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
