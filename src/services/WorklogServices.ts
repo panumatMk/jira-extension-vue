@@ -1,9 +1,10 @@
+import { DateUtils, Ticket } from "@/Utils/Utils";
 import { forkJoin, map, Observable, of, switchMap } from "rxjs";
 import { store } from "@/store/Store";
 import { ajax } from "rxjs/ajax";
 import { jiraUrl } from "@/services/env";
+import { Http } from "@/services/Header";
 import moment from "moment";
-import { getHeader } from "@/services/Service";
 
 interface Issue {
   key: string;
@@ -13,21 +14,44 @@ interface Issue {
   dayOfWeek: number;
 }
 
-function getAllDateOfWeek() {
-  let allDateOfWeek = [];
-  const weekDays = moment.weekdays();
-  const firstDateOfWeek = moment().startOf("week");
-  for (let i = 1; i < 6; i++) {
-    allDateOfWeek.push({
-      day: firstDateOfWeek.day(i).toDate(),
-      dayOfWeek: weekDays[i]
+export namespace WorklogServices {
+  export function addWorklogs$(data: Ticket, started: string[]) {
+    const addLogs$ = started.map(date => {
+      return addWorklog$(data, date);
     });
+    return forkJoin(addLogs$);
   }
-  return allDateOfWeek;
-}
 
+  export function addWorklog$(data: Ticket, started: string) {
+    const { loginStage } = store;
+    const payload = {
+      comment: data.comment.replace(DateUtils.DATE_VAR, DateUtils.getCommentDate(started)),
+      timeSpent: data.timeSpent,
+      started
+    };
+    return ajax({
+      url: `${loginStage?.host}/${jiraUrl.post_worklog(data.id)}`,
+      method: "POST",
+      headers: Http.getHeader(),
+      body: payload
+    }).pipe(map((data: any) => {
+      const { response } = data;
+      return response;
+    }));
+  }
 
-export namespace HistoryServices {
+  export function removeWorklog$(issueKey: string, id: string) {
+    const { loginStage } = store;
+    return ajax({
+      url: `${loginStage?.host}/${jiraUrl.delete_worklog(issueKey, id)}`,
+      method: "DELETE",
+      headers: Http.getHeader()
+    }).pipe(map((data: any) => {
+      const { response } = data;
+      return response;
+    }));
+  }
+
   function getWorklogsIssuesByDate(date: Date): Observable<{ issues: Issue[] }> {
     console.log("day", moment(date).day());
     const dateString = moment(date).format("YYYY/MM/DD");
@@ -36,7 +60,7 @@ export namespace HistoryServices {
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.get_search}?${jql}`,
       method: "GET",
-      headers: getHeader()
+      headers: Http.getHeader()
     }).pipe(
       map(result => {
         const { response } = result;
@@ -55,9 +79,9 @@ export namespace HistoryServices {
     const dateString = moment(date).format("YYYY/MM/DD");
     const { loginStage } = store;
     return ajax({
-      url: `${loginStage?.host}/${jiraUrl.get_worklog.replace("{{issueKey}}", issueKey)}`,
+      url: `${loginStage?.host}/${jiraUrl.get_worklog(issueKey)}`,
       method: "GET",
-      headers: getHeader()
+      headers: Http.getHeader()
     }).pipe(
       map(result => {
         const { response } = result;
@@ -79,7 +103,13 @@ export namespace HistoryServices {
               return getWorklogs(issue.key, date)
                 .pipe(
                   map(({ worklogIds }) => {
-                    return worklogIds.map((worklogId) => ({ ...issue, worklogId }));
+                    return worklogIds.map((worklogId) => (
+                        {
+                          ...issue,
+                          worklogId
+                        }
+                      )
+                    );
                   })
                 );
             });
@@ -102,5 +132,18 @@ export namespace HistoryServices {
       };
     }, {});
     return forkJoin(list);
+  }
+
+  function getAllDateOfWeek() {
+    let allDateOfWeek = [];
+    const weekDays = moment.weekdays();
+    const firstDateOfWeek = moment().startOf("week");
+    for (let i = 1; i < 6; i++) {
+      allDateOfWeek.push({
+        day: firstDateOfWeek.day(i).toDate(),
+        dayOfWeek: weekDays[i]
+      });
+    }
+    return allDateOfWeek;
   }
 }

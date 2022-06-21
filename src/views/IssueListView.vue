@@ -77,6 +77,7 @@ import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
 import { Service } from "@/services/Service";
 import { store } from "@/store/Store";
+import { WorklogServices } from "@/services/WorklogServices";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
@@ -131,8 +132,8 @@ function onAddIssue(data: any) {
 
 function send(data: Ticket) {
   iif(() => dates.value.length === 1,
-    Service.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
-    Service.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
+    WorklogServices.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
+    WorklogServices.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
   ).subscribe({
     next: (results) => {
       console.log(results);
