@@ -155,13 +155,12 @@ function copy() {
 </script>
 
 <style scoped lang="sass">
-::v-deep
-  .p-button.p-button-icon-only.p-button-rounded
-    width: 1.7rem
-    height: 1.7rem
+.p-button.p-button-icon-only.p-button-rounded
+  width: 1.7rem
+  height: 1.7rem
 
-  .p-datatable-scrollable .p-datatable-thead > tr > th
-    justify-content: center
+.p-datatable-scrollable .p-datatable-thead > tr > th
+  justify-content: center
 
 
 .group-header
