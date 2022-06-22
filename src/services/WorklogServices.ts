@@ -1,10 +1,11 @@
-import { DateUtils, Ticket } from "@/Utils/Utils";
 import { forkJoin, map, Observable, of, switchMap } from "rxjs";
 import { store } from "@/store/Store";
 import { ajax } from "rxjs/ajax";
 import { jiraUrl } from "@/services/env";
 import { Http } from "@/services/Header";
 import moment from "moment";
+import type { Ticket } from "@/Utils/Utils";
+import { DateUtils } from "@/Utils/Utils";
 
 interface Issue {
   key: string;

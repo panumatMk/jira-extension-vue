@@ -21,6 +21,7 @@
 import { defineEmits, ref } from "vue";
 import { Service } from "@/services/Service";
 import { SweetAlert } from "@/Utils/Utils";
+import { IssueServices } from "@/services/IssueServices";
 
 const jiraId = ref();
 
@@ -33,7 +34,7 @@ function closeModal() {
 }
 
 function addIssue() {
-  Service.getIssue$(jiraId.value)
+  IssueServices.getIssue$(jiraId.value)
     .subscribe({
       next: (data) => {
         jiraId.value = "";
