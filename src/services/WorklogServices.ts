@@ -144,9 +144,10 @@ export namespace WorklogServices {
     const weekDays = moment.weekdays();
     const firstDateOfWeek = moment().startOf("week");
     for (let i = 1; i < 6; i++) {
+      const nowDate = moment(firstDateOfWeek.day(i).toDate()).format('DD/MM/YYYY')
       allDateOfWeek.push({
         day: firstDateOfWeek.day(i).toDate(),
-        dayOfWeek: weekDays[i]
+        dayOfWeek: `${weekDays[i]} ${nowDate}`
       });
     }
     return allDateOfWeek;
