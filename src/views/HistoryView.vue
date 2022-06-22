@@ -6,7 +6,8 @@
   <span style="position: relative" v-if="isLoading === undefined">
     <h1 style="position: absolute;width: 150px;top: 110px;left: 180px;"> Not found </h1>
   </span>
-  <Carousel :value="issues" :numVisible="1" :numScroll="1" :page="currentPage" v-if="isLoading === false">
+<!--  :page="currentPage"-->
+  <Carousel :value="issues" :numVisible="1" :numScroll="1" v-if="isLoading === false && issues">
     <template #item="issue">
       <Fieldset :legend="issue.data.header" style="height: 330px;">
         <template v-for="(worklog, index) in issue.data.worklogs">
@@ -35,7 +36,7 @@ import { store } from "@/store/Store";
 
 const isLoading = ref(true);
 const issues = ref([]);
-const currentPage = ref();
+const currentPage = ref((new Date()).getDay() - 1);
 const host = toRef(store.loginStage, "host");
 onMounted(() => {
   WorklogServices.getAllWorklogsOfWeek()
@@ -50,7 +51,6 @@ onMounted(() => {
         });
 
         isLoading.value = false;
-        currentPage.value = (new Date()).getDay() - 1;
       },
       error: (err) => {
         SweetAlert.error(err.status, err?.response?.errorMessages[0]);
