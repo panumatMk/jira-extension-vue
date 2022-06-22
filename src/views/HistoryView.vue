@@ -14,7 +14,7 @@
           <span>
             [<a :href="host+'/browse/'+worklog.key" target="_blank" style="color: white">{{ worklog.key }}</a>]
             {{ worklog.summary }}
-            <span class="worklog-detail"> {{worklog.timeSpent}} {{worklog.comment}}</span>
+            <span class="worklog-detail"> {{ worklog.timeSpent }} {{ worklog.comment }}</span>
             <Button
               icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-text"
@@ -88,7 +88,8 @@ function removeWorklog(issueKey: string, id: string, index: number) {
   left: 120px;
 }
 
-.worklog-detail{
+.worklog-detail {
+  display: inline-block;
   font-size: 12px;
   padding: 2px;
   border-radius: 5px;
