@@ -35,7 +35,7 @@ import { store } from "@/store/Store";
 
 const isLoading = ref(true);
 const issues = ref([]);
-const currentPage = ref((new Date()).getDay() - 1);
+const currentPage = ref();
 const host = toRef(store.loginStage, "host");
 onMounted(() => {
   WorklogServices.getAllWorklogsOfWeek()
@@ -48,7 +48,9 @@ onMounted(() => {
             worklogs: data[key]
           };
         });
+
         isLoading.value = false;
+        currentPage.value = (new Date()).getDay() - 1;
       },
       error: (err) => {
         SweetAlert.error(err.status, err?.response?.errorMessages[0]);
