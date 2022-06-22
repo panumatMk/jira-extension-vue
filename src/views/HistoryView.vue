@@ -11,7 +11,7 @@
       <Fieldset :legend="issue.data.header" style="height: 330px;">
         <template v-for="(worklog, index) in issue.data.worklogs">
           <Divider align="left" type="dashed" v-if="index !== 0" />
-          <p> [{{ worklog.key }}] {{ worklog.summary }}
+          <p> [<a :href="host+'/browse/'+worklog.key" target="_blank" style="color: white">{{ worklog.key }}</a>] {{ worklog.summary }}
             <Button
               icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-text"
@@ -24,14 +24,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, toRef } from "vue";
 import { SweetAlert } from "@/Utils/Utils";
 import { WorklogServices } from "@/services/WorklogServices";
 import { debounceTime } from "rxjs";
+import { store } from "@/store/Store";
 
 const isLoading = ref(true);
 const issues = ref([]);
 const currentPage = ref((new Date()).getDay() - 1);
+const host = toRef(store.loginStage, "host");
 onMounted(() => {
   WorklogServices.getAllWorklogsOfWeek()
     .pipe(debounceTime(2000))

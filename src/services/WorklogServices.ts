@@ -85,14 +85,18 @@ export namespace WorklogServices {
       headers: Http.getHeader()
     }).pipe(
       map(result => {
-        const { response } = result;
-        const worklogs = (response as any)?.worklogs?.filter((worklog: any) => {
-          const startedDate = moment(new Date(worklog.started)).format("YYYY/MM/DD");
-          return dateString === startedDate && worklog.updateAuthor.name === store.mySelf?.name;
-        });
-        return { worklogIds: worklogs.map((w: any) => w.id) };
-      })
-    );
+          const { response } = result;
+          const worklogs = (response as any)?.worklogs?.filter((worklog: any) => {
+            const startedDate = moment(new Date(worklog.started)).format("YYYY/MM/DD");
+            return dateString === startedDate && worklog.updateAuthor.name === store.mySelf?.name;
+          });
+          return {
+            worklogs: worklogs.map(({ id, timeSpent, comment }) => ({ worklogId: id, timeSpent, comment }))
+          };
+        }
+      )
+    )
+      ;
   }
 
   function getWorklogsByDate(date: Date) {
@@ -103,11 +107,11 @@ export namespace WorklogServices {
             const queryList = issues.map((issue) => {
               return getWorklogs(issue.key, date)
                 .pipe(
-                  map(({ worklogIds }) => {
-                    return worklogIds.map((worklogId) => (
+                  map(({ worklogs }) => {
+                    return worklogs.map((worklog) => (
                         {
                           ...issue,
-                          worklogId
+                          ...worklog
                         }
                       )
                     );
