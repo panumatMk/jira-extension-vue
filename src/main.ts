@@ -27,6 +27,7 @@ import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import Carousel from 'primevue/carousel';
 import Fieldset from 'primevue/fieldset';
+import ProgressSpinner from 'primevue/progressspinner';
 
 
 const app = createApp(App);
@@ -48,6 +49,7 @@ app.component("TieredMenu", TieredMenu)
   .component("Toast", Toast)
   .component("Carousel", Carousel)
   .component("Fieldset", Fieldset)
+  .component("ProgressSpinner", ProgressSpinner)
 
 
 app.use(VueSweetalert2);
