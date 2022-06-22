@@ -17,6 +17,7 @@
               class="p-button-rounded p-button-danger p-button-text"
               @click="removeWorklog(worklog.key, worklog.worklogId, issue.index)" />
           </p>
+          <span> {{worklog.timeSpent}} {{worklog.comment}}</span>
         </template>
       </Fieldset>
     </template>
