@@ -11,13 +11,15 @@
       <Fieldset :legend="issue.data.header" style="height: 330px;">
         <template v-for="(worklog, index) in issue.data.worklogs">
           <Divider align="left" type="dashed" v-if="index !== 0" />
-          <p> [<a :href="host+'/browse/'+worklog.key" target="_blank" style="color: white">{{ worklog.key }}</a>] {{ worklog.summary }}
+          <span>
+            [<a :href="host+'/browse/'+worklog.key" target="_blank" style="color: white">{{ worklog.key }}</a>]
+            {{ worklog.summary }}
+            <span style="font-size: 12px"> {{worklog.timeSpent}} {{worklog.comment}}</span>
             <Button
               icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-text"
               @click="removeWorklog(worklog.key, worklog.worklogId, issue.index)" />
-          </p>
-          <span> {{worklog.timeSpent}} {{worklog.comment}}</span>
+          </span>
         </template>
       </Fieldset>
     </template>
