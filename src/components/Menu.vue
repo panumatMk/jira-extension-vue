@@ -3,6 +3,7 @@ import type { Menu } from "../models/MenuInterface";
 import { onMounted, ref } from "vue";
 import { useStoreBehaviorSubject } from "@/store/Store";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
+import { debounceTime } from "rxjs";
 
 const list = ref<Menu[]>([
   {
@@ -29,6 +30,7 @@ const key: keyof AppStage = "loginStage";
 
 onMounted(() => {
   useStoreBehaviorSubject<"loginStage", LoginStage>(key)
+    .pipe(debounceTime(200))
     .subscribe((loginStage: any) => {
       let color;
       if (loginStage?.online === undefined) {

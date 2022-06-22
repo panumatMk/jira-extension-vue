@@ -22,7 +22,7 @@ import { SweetAlert } from "@/Utils/Utils";
 import { WorklogServices } from "@/services/WorklogServices";
 
 const issues = ref([]);
-const currentPage = ref((new Date()).getDay() - 2);
+const currentPage = ref((new Date()).getDay() - 1);
 onMounted(() => {
   WorklogServices.getAllWorklogsOfWeek()
     .subscribe({
