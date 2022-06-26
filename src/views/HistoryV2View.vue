@@ -8,14 +8,15 @@
     </span>
   <div style="display: flex; gap: 10px;align-items: center;">
     <H4 style="margin: 0"> Period </H4>
-    <Calendar style="width: 220px;" id="range" v-model="rangeDate" selectionMode="range" :manualInput="false"
+    <Calendar style="width: 220px;" id="range"
+              v-model="rangeDate" selectionMode="range" :manualInput="false"
+              :hide="updateHistoriesRange"
               dateFormat="dd/mm/yy" />
-<!--    {{ startDate }} | {{ currentDate }}-->
   </div>
   <div class="history-container" v-if="isLoading === false">
     <template v-for="issue in issues">
       <Fieldset :legend="issue.header">
-        <template v-for="(worklog, index) in issue.data.worklogs">
+        <template v-for="(worklog, index) in issue.worklogs">
           <Divider align="left" type="dashed" v-if="index !== 0" />
           <span>
             [<a :href="host+'/browse/'+worklog.key" target="_blank" style="color: white">{{ worklog.key }}</a>]
@@ -33,40 +34,57 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, toRef } from "vue";
+import { onMounted, onUpdated, ref, toRef } from "vue";
 import { WorklogServices } from "@/services/WorklogServices";
 import { store } from "@/store/Store";
-import { debounceTime } from "rxjs";
+import { debounceTime, Subject, switchMap, tap } from "rxjs";
 import { SweetAlert } from "@/Utils/Utils";
 
 const isLoading = ref(true);
 const rangeDate = ref([]);
 const issues = ref<Date[]>();
 const host = toRef(store.loginStage, "host");
-const startDate = new Date();
-const currentDate = new Date();
-startDate.setDate(startDate.getDate() - 7);
-rangeDate.value = [startDate, currentDate];
+const firstDay = new Date();
+const today = new Date();
+firstDay.setDate(today.getDate() - 7);
+rangeDate.value = [firstDay, today];
+
+const getWorklogHistories$ = new Subject<void>();
+getWorklogHistories$
+  .pipe(
+    switchMap(() => {
+        const currentRange = JSON.parse(JSON.stringify(rangeDate.value));
+        return WorklogServices.getWorklogHistoryRangeDate(firstDay, today)
+          .pipe(tap(() => {
+            rangeDate.value = [new Date(currentRange[0]), currentRange[1] ? new Date(currentRange[1]) : null];
+            console.log(rangeDate.value);
+          }));
+      }
+    )
+  )
+  .subscribe({
+    next: (data) => {
+      issues.value = Object.keys(data).map((key) => {
+        return {
+          header: key,
+          worklogs: data[key]
+        };
+      }).reverse();
+      isLoading.value = false;
+    },
+    error: (err) => {
+      SweetAlert.error(err.status, err?.response?.errorMessages[0]);
+      isLoading.value = undefined;
+    }
+  });
 
 onMounted(() => {
-  WorklogServices.getWorklogHistoryRangeDate(rangeDate.value[0] as Date, rangeDate.value[1] as Date)
-    .pipe(debounceTime(2000))
-    .subscribe({
-      next: (data) => {
-        issues.value = Object.keys(data).map((key) => {
-          return {
-            header: key,
-            worklogs: data[key]
-          };
-        });
-        isLoading.value = false;
-      },
-      error: (err) => {
-        SweetAlert.error(err.status, err?.response?.errorMessages[0]);
-        isLoading.value = undefined;
-      }
-    });
+  getWorklogHistories$.next();
 });
+
+function updateHistoriesRange() {
+  getWorklogHistories$.next();
+}
 
 function removeWorklog(issueKey: string, id: string, index: number) {
   WorklogServices.removeWorklog$(issueKey, id)

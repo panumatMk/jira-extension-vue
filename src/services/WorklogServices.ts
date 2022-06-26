@@ -142,6 +142,9 @@ export namespace WorklogServices {
   export function getDaysArray(start: Date, end: Date) {
     const arr = [];
     for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+      if(([0,6]).includes(d.getDay())){
+        continue;
+      }
       arr.push({
         day: new Date(d),
         dayOfWeek: new Date(d).getDay()
@@ -157,10 +160,11 @@ export namespace WorklogServices {
     }else{
       dates = getDaysArray(startDate, endDate);
     }
+    const weekDays = moment.weekdays();
     const list = dates.reduce((total, date) => {
       return {
         ...total,
-        [`${date.dayOfWeek} ${moment(date.day).format("DD/MM/YYYY")}`]: getWorklogsByDate(date.day)
+        [`${weekDays[date.dayOfWeek]} ${moment(date.day).format("DD/MM/YYYY")}`]: getWorklogsByDate(date.day)
       };
     }, {});
     return forkJoin(list);
