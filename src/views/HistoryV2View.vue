@@ -10,6 +10,7 @@
     <H4 style="margin: 0"> Period </H4>
     <Calendar style="width: 220px;" id="range" v-model="rangeDate" selectionMode="range" :manualInput="false"
               dateFormat="dd/mm/yy" />
+<!--    {{ startDate }} | {{ currentDate }}-->
   </div>
   <div class="history-container" v-if="isLoading === false">
     <template v-for="issue in issues">
@@ -42,12 +43,12 @@ const isLoading = ref(true);
 const rangeDate = ref([]);
 const issues = ref<Date[]>();
 const host = toRef(store.loginStage, "host");
+const startDate = new Date();
+const currentDate = new Date();
+startDate.setDate(startDate.getDate() - 7);
+rangeDate.value = [startDate, currentDate];
 
 onMounted(() => {
-  const currentDate = new Date();
-  let startDate = new Date();
-  startDate.setDate(startDate.getDate() - 7);
-  rangeDate.value = [startDate, currentDate];
   WorklogServices.getWorklogHistoryRangeDate(rangeDate.value[0] as Date, rangeDate.value[1] as Date)
     .pipe(debounceTime(2000))
     .subscribe({
