@@ -5,7 +5,7 @@ import { computed } from "vue";
 import router from "@/router";
 import { useStoreBehaviorSubject } from "@/store/Store";
 import type { AppStage, LoginStage } from "@/models/StageInterface";
-import { catchError, debounceTime, EMPTY, switchMap, take, tap } from "rxjs";
+import { catchError, debounceTime, EMPTY, switchMap, take } from "rxjs";
 import { Service } from "@/services/Service";
 
 const route = useRoute();
@@ -19,7 +19,7 @@ useStoreBehaviorSubject<"loginStage", LoginStage>(key)
         router.push("/login");
         return EMPTY;
       } else {
-        router.push("/logwork")
+        router.push("/logwork");
         return Service.testConnection$()
           .pipe(
             catchError(() => {
@@ -39,6 +39,7 @@ const path = computed(() => {
     case "/logwork":
       return "Logwork";
     case "/history":
+    case  "/history/v2":
       return "History";
     default:
       return "";
