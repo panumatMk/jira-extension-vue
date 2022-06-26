@@ -139,18 +139,7 @@ export namespace WorklogServices {
     return forkJoin(list);
   }
 
-  export function getWorklogHistoryRangeDate(startDate: Date, endDate: Date) {
-    const dates = getDaysArray(startDate, endDate);
-    const list = dates.reduce((total, date) => {
-      return {
-        ...total,
-        [`${date.dayOfWeek} ${moment(date.day).format("DD/MM/YYYY")}`]: getWorklogsByDate(date.day)
-      };
-    }, {});
-    return forkJoin(list);
-  }
-
-  export const getDaysArray = function(start: Date, end: Date) {
+  export function getDaysArray(start: Date, end: Date) {
     const arr = [];
     for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
       arr.push({
@@ -160,6 +149,22 @@ export namespace WorklogServices {
     }
     return arr;
   };
+
+  export function getWorklogHistoryRangeDate(startDate: Date, endDate: Date) {
+    let dates = [];
+    if(!endDate){
+      dates = [startDate];
+    }else{
+      dates = getDaysArray(startDate, endDate);
+    }
+    const list = dates.reduce((total, date) => {
+      return {
+        ...total,
+        [`${date.dayOfWeek} ${moment(date.day).format("DD/MM/YYYY")}`]: getWorklogsByDate(date.day)
+      };
+    }, {});
+    return forkJoin(list);
+  }
 
   function getAllDateOfWeek() {
     let allDateOfWeek = [];
