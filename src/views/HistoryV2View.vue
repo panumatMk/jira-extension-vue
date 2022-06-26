@@ -48,7 +48,7 @@ onMounted(() => {
   let startDate = new Date();
   startDate.setDate(startDate.getDate() - 7);
   rangeDate.value = [startDate, currentDate];
-  WorklogServices.getWorklogHistoryRangeDate(rangeDate[0] as Date, rangeDate[1] as Date)
+  WorklogServices.getWorklogHistoryRangeDate(rangeDate.value[0] as Date, rangeDate.value[1] as Date)
     .pipe(debounceTime(2000))
     .subscribe({
       next: (data) => {
