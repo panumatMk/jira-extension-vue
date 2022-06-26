@@ -14,7 +14,7 @@ const list = ref<Menu[]>([
   {
     label: "History",
     icon: "pi pi-fw pi-history",
-    to: "/history"
+    to: "/history/v2"
   },
   {
     separator: true

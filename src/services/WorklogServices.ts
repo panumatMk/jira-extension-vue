@@ -139,12 +139,34 @@ export namespace WorklogServices {
     return forkJoin(list);
   }
 
+  export function getWorklogHistoryRangeDate(startDate: Date, endDate: Date) {
+    const dates = getDaysArray(startDate, endDate);
+    const list = dates.reduce((total, date) => {
+      return {
+        ...total,
+        [`${date.dayOfWeek} ${moment(date.day).format("DD/MM/YYYY")}`]: getWorklogsByDate(date.day)
+      };
+    }, {});
+    return forkJoin(list);
+  }
+
+  export const getDaysArray = function(start: Date, end: Date) {
+    const arr = [];
+    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+      arr.push({
+        day: new Date(d),
+        dayOfWeek: new Date(d).getDay()
+      });
+    }
+    return arr;
+  };
+
   function getAllDateOfWeek() {
     let allDateOfWeek = [];
     const weekDays = moment.weekdays();
     const firstDateOfWeek = moment().startOf("week");
     for (let i = 1; i < 6; i++) {
-      const nowDate = moment(firstDateOfWeek.day(i).toDate()).format('DD/MM/YYYY')
+      const nowDate = moment(firstDateOfWeek.day(i).toDate()).format("DD/MM/YYYY");
       allDateOfWeek.push({
         day: firstDateOfWeek.day(i).toDate(),
         dayOfWeek: `${weekDays[i]} ${nowDate}`
