@@ -7,11 +7,11 @@
       <h1 style="position: absolute;width: 150px;top: 110px;left: 180px;"> Not found </h1>
     </span>
   <div style="display: flex; gap: 10px;align-items: center;">
-    <H4 style="margin: 0"> Period </H4>
+    <h4 style="margin: 0"> Period </h4>
     <Calendar style="width: 220px;" id="range"
               v-model="rangeDate" selectionMode="range" :manualInput="false"
-              :hide="updateHistoriesRange"
               dateFormat="dd/mm/yy" />
+    <Button icon="pi pi-search" class="p-button-rounded p-button-success" @click="updateHistoriesRange()" />
   </div>
   <div class="history-container" v-if="isLoading === false">
     <template v-for="issue in issues">
@@ -34,10 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, ref, toRef } from "vue";
+import { onMounted, ref, toRef } from "vue";
 import { WorklogServices } from "@/services/WorklogServices";
 import { store } from "@/store/Store";
-import { debounceTime, Subject, switchMap, tap } from "rxjs";
+import { catchError, finalize, NEVER, Subject, switchMap } from "rxjs";
 import { SweetAlert } from "@/Utils/Utils";
 
 const isLoading = ref(true);
@@ -53,12 +53,20 @@ const getWorklogHistories$ = new Subject<void>();
 getWorklogHistories$
   .pipe(
     switchMap(() => {
+        isLoading.value = true;
         const currentRange = JSON.parse(JSON.stringify(rangeDate.value));
         return WorklogServices.getWorklogHistoryRangeDate(firstDay, today)
-          .pipe(tap(() => {
-            rangeDate.value = [new Date(currentRange[0]), currentRange[1] ? new Date(currentRange[1]) : null];
-            console.log(rangeDate.value);
-          }));
+          .pipe(
+            catchError((err) => {
+              SweetAlert.error(err.status, err?.response?.errorMessages[0]);
+              isLoading.value = undefined;
+              return NEVER;
+            }),
+            finalize(() => {
+              rangeDate.value = [new Date(currentRange[0]), currentRange[1] ? new Date(currentRange[1]) : null];
+              console.log(rangeDate.value);
+            })
+          );
       }
     )
   )
@@ -71,10 +79,6 @@ getWorklogHistories$
         };
       }).reverse();
       isLoading.value = false;
-    },
-    error: (err) => {
-      SweetAlert.error(err.status, err?.response?.errorMessages[0]);
-      isLoading.value = undefined;
     }
   });
 
