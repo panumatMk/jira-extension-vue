@@ -44,10 +44,11 @@ export namespace WorklogServices {
   export function editWorklog$(issueKey: string, data: Ticket, started: string) {
     const { loginStage } = store;
     const payload = {
-      comment: data.comment.replace(DateUtils.DATE_VAR, DateUtils.getCommentDate(started)),
+      comment: data.comment,
       timeSpent: data.timeSpent,
       started
     };
+    console.log(data);
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.update_worklog(issueKey, data.id)}`,
       method: "PUT",
@@ -108,7 +109,7 @@ export namespace WorklogServices {
             return dateString === startedDate && worklog.updateAuthor.name === store.mySelf?.name;
           });
           return {
-            worklogs: worklogs.map(({ id, timeSpent, comment }) => ({ worklogId: id, timeSpent, comment }))
+            worklogs: worklogs.map(({ id, timeSpent, comment, started }) => ({ worklogId: id, timeSpent, comment, started }))
           };
         }
       )

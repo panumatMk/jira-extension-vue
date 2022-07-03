@@ -4,20 +4,20 @@
           :style="{width: '400px'}" :modal="true">
     <div style="display: flex;flex-direction: column;gap: 10px;">
       <div style="word-wrap: break-word;">
-        <span style="font-weight: bold;"> [{{ issueDetail.key }}]</span>
-        <span> {{ issueDetail.summary }} </span>
+        <span style="font-weight: bold;"> [{{ issueKey }}]</span>
+        <span> {{ summary }} </span>
       </div>
       <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
                 time spent
             </span>
-        <InputText placeholder="" v-model="issueDetail.timeSpent" />
+        <InputText placeholder="" v-model="timeSpent" />
       </div>
       <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
                 comment
             </span>
-        <InputText placeholder="" v-model="issueDetail.comment" />
+        <InputText placeholder="" v-model="comment" />
       </div>
     </div>
     <template #footer>
@@ -28,15 +28,36 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, ref } from "vue";
+import { computed, defineEmits, onMounted, onUpdated, ref } from "vue";
 import { SweetAlert } from "@/Utils/Utils";
 import { IssueServices } from "@/services/IssueServices";
 import { WorklogServices } from "@/services/WorklogServices";
+import { from } from "@vueuse/rxjs";
 
 const issueDetail = ref();
 
 const props = defineProps(["display", "issueDetail"]);
 const emit = defineEmits(["onCloseModal", "onEditWorklog"]);
+const timeSpent = ref();
+const comment = ref();
+const issueKey = ref();
+const summary = ref();
+
+from(issueDetail).subscribe((data) => {
+  console.log(data);
+})
+
+computed((data) => {
+  console.log(data);
+})
+
+const updateDetail = ((issueDetail: any) => {
+  console.log('in update detail');
+  summary.value = issueDetail.summary;
+  issueKey.value = issueDetail.key;
+  timeSpent.value = issueDetail.timeSpent;
+  comment.value = issueDetail.comment;
+})
 
 function closeModal() {
   emit("onCloseModal", false);
@@ -53,6 +74,7 @@ function editWorklog() {
       }
     });
 }
+
 </script>
 
 <style lang="sass">

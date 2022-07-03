@@ -23,20 +23,44 @@
             {{ worklog.summary }}
             <span class="worklog-detail"> {{ worklog.timeSpent }} {{ worklog.comment }}</span>
             <Button
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success p-button-text"
+              @click="openEditModal(worklog)" />
+            <Button
               icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-text"
               @click="removeWorklog(worklog.key, worklog.worklogId, issue.index)" />
-              <Button
-                icon="pi pi-pencil"
-                class="p-button-rounded p-button-success p-button-text"
-                @click="openEditModal(worklog)" />
           </span>
         </template>
       </Fieldset>
     </template>
   </div>
 
-  <EditLogworkDialog :display="openEditDialog" :issue-detail="issueDetail" @onCloseModal="closeEditModal" @onEditWorklog="onEditIssue($event)" />
+  <Dialog header="Add" v-model:visible="openEditDialog"
+          :closable="false"
+          :style="{width: '400px'}" :modal="true">
+    <div style="display: flex;flex-direction: column;gap: 10px;">
+      <div style="word-wrap: break-word;line-height: 1.5em">
+        <span style="font-weight: bold;"> [{{ issueKey }}]</span> <span> {{ summary }} </span>
+      </div>
+      <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+                time spent
+            </span>
+        <InputText placeholder="" v-model="timeSpent" />
+      </div>
+      <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+                comment
+            </span>
+        <InputText placeholder="" v-model="comment" />
+      </div>
+    </div>
+    <template #footer>
+      <Button label="Cancel" @click="closeEditModal()" class="p-button-text" />
+      <Button label="Edit" @click="editWorklog" autofocus />
+    </template>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -55,7 +79,13 @@ const today = new Date();
 firstDay.setDate(today.getDate() - 7);
 const rangeDate = ref([firstDay, today]);
 const openEditDialog = ref(false);
-const issueDetail = ref({});
+
+const timeSpent = ref();
+const comment = ref();
+const issueKey = ref();
+const summary = ref();
+const worklogId = ref();
+const started = ref();
 
 const getWorklogHistories$ = new Subject<void>();
 getWorklogHistories$
@@ -112,10 +142,19 @@ function removeWorklog(issueKey: string, id: string, index: number) {
 }
 
 function openEditModal(worklog : any) {
-  issueDetail.value = worklog;
+  console.log(worklog);
+  updateDetail({...worklog});
   openEditDialog.value = true;
-  issueDetail.value = {}
 }
+
+const updateDetail = ((issueDetail: any) => {
+  worklogId.value = issueDetail.worklogId;
+  summary.value = issueDetail.summary;
+  issueKey.value = issueDetail.key;
+  timeSpent.value = issueDetail.timeSpent;
+  comment.value = issueDetail.comment;
+  started.value = issueDetail.started;
+})
 
 function closeEditModal() {
   openEditDialog.value = false;
@@ -123,6 +162,25 @@ function closeEditModal() {
 
 function onEditIssue() {
   closeEditModal();
+}
+
+function editWorklog(worklog: any) {
+  WorklogServices.editWorklog$(issueKey.value, {
+    id: worklogId.value,
+    comment: comment.value,
+    started: started.value,
+    timeSpent: timeSpent.value
+  }, worklog.started)
+    .subscribe({
+      next: (_) => {
+        openEditDialog.value = false
+        SweetAlert.success();
+        getWorklogHistories$.next();
+      },
+      error: (err) => {
+        SweetAlert.error(err.status, err?.response?.errorMessages[0]);
+      }
+    });
 }
 
 </script>
@@ -138,7 +196,7 @@ function onEditIssue() {
   flex-direction: column;
 }
 
-.p-button.p-button-rounded.p-button-danger.p-button-text {
+.p-button.p-button-rounded.p-button-danger.p-button-text, .p-button.p-button-rounded.p-button-success.p-button-text {
   width: 1.3rem;
   height: 1.3rem;
 }
