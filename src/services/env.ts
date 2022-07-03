@@ -7,5 +7,6 @@ export const jiraUrl = {
   get_worklog: (issueKey: string) => `${root_path}/issue/${issueKey}/worklog`,
   post_worklog: (issueKey: string) => `${root_path}/issue/${issueKey}/worklog`,
   delete_worklog: (issueKey: string, id: string) => `${root_path}/issue/${issueKey}/worklog/${id}`,
+  update_worklog: (issueKey: string, id: string) => `${root_path}/issue/${issueKey}/worklog/${id}`,
   get_issue: (issueKey: string) => `${root_path}/issue/${issueKey}`
 };

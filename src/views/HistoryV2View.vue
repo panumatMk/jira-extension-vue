@@ -26,11 +26,17 @@
               icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-text"
               @click="removeWorklog(worklog.key, worklog.worklogId, issue.index)" />
+              <Button
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-success p-button-text"
+                @click="openEditModal(worklog)" />
           </span>
         </template>
       </Fieldset>
     </template>
   </div>
+
+  <EditLogworkDialog :display="openEditDialog" :issue-detail="issueDetail" @onCloseModal="closeEditModal" @onEditWorklog="onEditIssue($event)" />
 </template>
 
 <script setup lang="ts">
@@ -39,6 +45,7 @@ import { WorklogServices } from "@/services/WorklogServices";
 import { store } from "@/store/Store";
 import { catchError, finalize, NEVER, Subject, switchMap } from "rxjs";
 import { SweetAlert } from "@/Utils/Utils";
+import EditLogworkDialog from "@/components/EditLogworkDialog.vue";
 
 const isLoading = ref(true);
 const issues = ref<Date[]>();
@@ -47,6 +54,8 @@ const firstDay = new Date();
 const today = new Date();
 firstDay.setDate(today.getDate() - 7);
 const rangeDate = ref([firstDay, today]);
+const openEditDialog = ref(false);
+const issueDetail = ref({});
 
 const getWorklogHistories$ = new Subject<void>();
 getWorklogHistories$
@@ -96,9 +105,24 @@ function removeWorklog(issueKey: string, id: string, index: number) {
           ...issues.value[index],
           worklogs
         };
+        getWorklogHistories$.next();
       },
       error: (err) => SweetAlert.error(err.status, err?.response?.errorMessages[0])
     });
+}
+
+function openEditModal(worklog : any) {
+  issueDetail.value = worklog;
+  openEditDialog.value = true;
+  issueDetail.value = {}
+}
+
+function closeEditModal() {
+  openEditDialog.value = false;
+}
+
+function onEditIssue() {
+  closeEditModal();
 }
 
 </script>

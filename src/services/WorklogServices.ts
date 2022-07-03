@@ -41,6 +41,24 @@ export namespace WorklogServices {
     }));
   }
 
+  export function editWorklog$(issueKey: string, data: Ticket, started: string) {
+    const { loginStage } = store;
+    const payload = {
+      comment: data.comment.replace(DateUtils.DATE_VAR, DateUtils.getCommentDate(started)),
+      timeSpent: data.timeSpent,
+      started
+    };
+    return ajax({
+      url: `${loginStage?.host}/${jiraUrl.update_worklog(issueKey, data.id)}`,
+      method: "PUT",
+      headers: Http.getHeader(),
+      body: payload
+    }).pipe(map((data: any) => {
+      const { response } = data;
+      return response;
+    }));
+  }
+
   export function removeWorklog$(issueKey: string, id: string) {
     const { loginStage } = store;
     return ajax({
