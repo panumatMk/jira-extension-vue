@@ -41,31 +41,27 @@ import { catchError, finalize, NEVER, Subject, switchMap } from "rxjs";
 import { SweetAlert } from "@/Utils/Utils";
 
 const isLoading = ref(true);
-const rangeDate = ref([]);
 const issues = ref<Date[]>();
 const host = toRef(store.loginStage, "host");
 const firstDay = new Date();
 const today = new Date();
 firstDay.setDate(today.getDate() - 7);
-rangeDate.value = [firstDay, today];
+const rangeDate = ref([firstDay, today]);
 
 const getWorklogHistories$ = new Subject<void>();
 getWorklogHistories$
   .pipe(
     switchMap(() => {
         isLoading.value = true;
-        const currentRange = JSON.parse(JSON.stringify(rangeDate.value));
-        return WorklogServices.getWorklogHistoryRangeDate(firstDay, today)
+        const startDate =  JSON.parse(JSON.stringify(rangeDate.value[0]));
+        const endDate = rangeDate.value[1] ? JSON.parse(JSON.stringify(rangeDate.value[1])): null;
+        return WorklogServices.getWorklogHistoryRangeDate(new Date(startDate), endDate? new Date(endDate) : null)
           .pipe(
             catchError((err) => {
               SweetAlert.error(err.status, err?.response?.errorMessages[0]);
               isLoading.value = undefined;
               return NEVER;
             }),
-            finalize(() => {
-              rangeDate.value = [new Date(currentRange[0]), currentRange[1] ? new Date(currentRange[1]) : null];
-              console.log(rangeDate.value);
-            })
           );
       }
     )

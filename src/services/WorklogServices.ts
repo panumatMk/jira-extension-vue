@@ -54,7 +54,6 @@ export namespace WorklogServices {
   }
 
   function getWorklogsIssuesByDate(date: Date): Observable<{ issues: Issue[] }> {
-    console.log("day", moment(date).day());
     const dateString = moment(date).format("YYYY/MM/DD");
     const { loginStage } = store;
     const jql = `jql=worklogDate = '${dateString}' AND worklogAuthor = currentUser()`;
@@ -153,7 +152,7 @@ export namespace WorklogServices {
     return arr;
   };
 
-  export function getWorklogHistoryRangeDate(startDate: Date, endDate: Date) {
+  export function getWorklogHistoryRangeDate(startDate: Date, endDate?: Date) {
     let dates = [];
     if(!endDate){
       dates = [startDate];

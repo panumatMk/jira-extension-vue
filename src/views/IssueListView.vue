@@ -78,6 +78,7 @@ import AddTicketDialog from "@/components/AddTicketDialog.vue";
 import { Service } from "@/services/Service";
 import { store } from "@/store/Store";
 import { WorklogServices } from "@/services/WorklogServices";
+import { FilterMatchMode } from "primevue/api";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
@@ -85,6 +86,7 @@ const dates = ref([new Date()]);
 const list = ref<Ticket[]>();
 const host = toRef(store.loginStage, "host");
 const openAddDialog = ref(false);
+const filters = ref({'global': {value: null, matchMode: FilterMatchMode.CONTAINS},});
 onMounted(() => {
   JIRA.getTickets().subscribe((tickets) => {
     list.value = tickets ? Object.values(tickets) : [];
