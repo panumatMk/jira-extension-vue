@@ -12,10 +12,10 @@
       groupRowsBy="id"
       sortField="id"
       sortMode="single"
-      :sortOrder="1"
     >
       <Column :rowReorder="true" headerStyle="max-width: 50px" bodyStyle="max-width: 50px;justify-content:center" />
-      <Column field="timeSpent" header="timeSpent" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
+      <Column field="timeSpent" header="Time Spent" headerStyle="max-width: 120px" bodyStyle="max-width: 120px">
+
         <template #editor="{ data, field }">
           <InputText v-model="data[field]" autofocus style="max-width: 100px" />
         </template>
@@ -29,7 +29,7 @@
       <Column header="Action" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
         <template #body="{data,index}">
           <div style="display: flex;gap:7px;">
-            <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(data)" />
+            <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(index)" />
             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(data)" />
           </div>
         </template>
@@ -74,10 +74,8 @@ import type { Ticket } from "@/Utils/Utils";
 import { DateUtils, JIRA, SweetAlert, Utils } from "@/Utils/Utils";
 import { iif, Subject } from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
-import { Service } from "@/services/Service";
 import { store } from "@/store/Store";
 import { WorklogServices } from "@/services/WorklogServices";
-import { FilterMatchMode } from "primevue/api";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
@@ -112,16 +110,13 @@ function closeAddModal(open: boolean) {
 }
 
 function addIssue({ id, label }: Ticket) {
-  console.log("addIssue");
   const newTicket: Ticket = {
     id,
     label,
     timeSpent: "",
     comment: ""
   };
-  console.log(1, list.value);
   list.value = [...list.value || [], newTicket];
-  console.log(2, list.value);
   updateTickets$.next(list.value);
 }
 
@@ -130,7 +125,12 @@ function onAddIssue(data: any) {
   closeAddModal(false);
 }
 
-function send(data: Ticket) {
+function send(index: number){
+  const ticketList = (list.value? [...list.value]: []) as Ticket[];
+  const listData = ticketList.sort((a,b) => {
+    return a.id >= b.id ? 1 : -1;
+  });
+  const data = listData[index];
   iif(() => dates.value.length === 1,
     WorklogServices.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
     WorklogServices.addWorklogs$(data, DateUtils.getSendingDates(dates.value))

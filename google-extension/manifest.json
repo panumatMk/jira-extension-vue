@@ -1,7 +1,7 @@
 {
-  "name": "Jira Worklog Dev",
+  "name": "Jira Worklog",
   "description": "Jira Helper",
-  "version": "3.0",
+  "version": "3.4",
   "manifest_version": 3,
   "icons": {
     "64": "jira.png"

@@ -7,7 +7,6 @@ export namespace Service {
     return UserServices.getCurrentUser()
       .pipe(
         tap(({ response }) => {
-          console.log("testConnection$", response);
           store.mySelf.name = response?.name;
         })
       );

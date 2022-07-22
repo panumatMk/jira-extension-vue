@@ -48,7 +48,6 @@ export namespace WorklogServices {
       timeSpent: data.timeSpent,
       started
     };
-    console.log(data);
     return ajax({
       url: `${loginStage?.host}/${jiraUrl.update_worklog(issueKey, data.id)}`,
       method: "PUT",
@@ -157,27 +156,25 @@ export namespace WorklogServices {
     return forkJoin(list);
   }
 
-  export function getDaysArray(start: Date, end: Date) {
-    const arr = [];
-    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-      if(([0,6]).includes(d.getDay())){
-        continue;
+  export function getDaysArray(start: Date, end?: Date) {
+    if (end) {
+      const arr = [];
+      for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+        arr.push({
+          day: new Date(d),
+          dayOfWeek: new Date(d).getDay()
+        });
       }
-      arr.push({
-        day: new Date(d),
-        dayOfWeek: new Date(d).getDay()
-      });
+      return arr;
     }
-    return arr;
+    return [{
+      day: new Date(start),
+      dayOfWeek: new Date(start).getDay()
+    }];
   };
 
   export function getWorklogHistoryRangeDate(startDate: Date, endDate?: Date) {
-    let dates = [];
-    if(!endDate){
-      dates = [startDate];
-    }else{
-      dates = getDaysArray(startDate, endDate);
-    }
+    const dates = getDaysArray(startDate, endDate);
     const weekDays = moment.weekdays();
     const list = dates.reduce((total, date) => {
       return {
@@ -192,7 +189,7 @@ export namespace WorklogServices {
     let allDateOfWeek = [];
     const weekDays = moment.weekdays();
     const firstDateOfWeek = moment().startOf("week");
-    for (let i = 1; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
       const nowDate = moment(firstDateOfWeek.day(i).toDate()).format("DD/MM/YYYY");
       allDateOfWeek.push({
         day: firstDateOfWeek.day(i).toDate(),
