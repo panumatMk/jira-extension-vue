@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('../views/IssueListView.vue')
     },
     {
+      path: '/assignToMe',
+      name: 'assignToMe',
+      component: () => import('../views/AssignToMe.vue')
+    },
+    {
       path: '/history',
       name: 'history',
       component: () => import('../views/HistoryView.vue')

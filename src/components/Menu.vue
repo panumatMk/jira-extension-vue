@@ -12,6 +12,11 @@ const list = ref<Menu[]>([
     to: "/logwork"
   },
   {
+    label: "Assign to me",
+    icon: "pi pi-chevron-circle-right",
+    to: "/assignToMe"
+  },
+  {
     label: "History",
     icon: "pi pi-fw pi-history",
     to: "/history/v2"
@@ -50,7 +55,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <TieredMenu :model="list" style="width: 130px;">
+  <TieredMenu :model="list" style="width: 170px;">
   </TieredMenu>
 </template>
 

@@ -20,3 +20,5 @@ export namespace IssueServices {
     }));
   }
 }
+
+// filter=11870&jql=project%20%3D%20BO%20AND%20issuetype%20in%20subTaskIssueTypes()%20AND%20status%20in%20(Open%2C%20"In%20Progress")%20AND%20assignee%20in%20(currentUser())%20ORDER%20BY%20created%20DESC

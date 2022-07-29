@@ -38,6 +38,8 @@ const path = computed(() => {
       return "Login";
     case "/logwork":
       return "Logwork";
+    case "/assignToMe":
+      return "Logwork (Assign To Me)";
     case "/history":
     case  "/history/v2":
       return "History";

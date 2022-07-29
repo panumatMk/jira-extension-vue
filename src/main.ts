@@ -10,6 +10,7 @@ import "primevue/resources/themes/saga-blue/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import "primevue/resources/themes/bootstrap4-dark-blue/theme.css";
+import DataView from 'primevue/dataview';
 import TieredMenu from "primevue/tieredmenu";
 import Card from "primevue/card";
 import InputText from "primevue/inputtext";
@@ -50,6 +51,7 @@ app.component("TieredMenu", TieredMenu)
   .component("Carousel", Carousel)
   .component("Fieldset", Fieldset)
   .component("ProgressSpinner", ProgressSpinner)
+  .component("DataView", DataView)
 
 
 app.use(VueSweetalert2);
