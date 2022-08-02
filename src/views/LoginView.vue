@@ -78,7 +78,6 @@ onMounted(() => {
   const key: keyof AppStage = "loginStage";
   useStoreBehaviorSubject<"loginStage", LoginStage>(key)
     .subscribe((loginStage: any) => {
-      console.log("useStoreObservable");
       host.value = loginStage?.host;
       username.value = loginStage?.username;
       password.value = loginStage?.password;

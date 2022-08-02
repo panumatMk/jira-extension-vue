@@ -5,7 +5,7 @@
     <template v-for="item in getList">
       <div class="card-l">
         <div>
-          <span v-tooltip.top="'artifact'" v-highlight="{search}"
+          <span v-tooltip.top="'artifact'"
                 v-if="item.parent.link">
             <a :href="host+'/browse/'+item.parent.key" target="_blank">{{ item.parent.key
               }}</a>  / </span>
@@ -14,7 +14,6 @@
           <span style="line-height: 1.5"> : {{ item.summary }} </span>
           <span class="status"
                 :class="[item.status === 'Open'? 'open':'', item.status === 'In Progress'? 'in-progress':'']"
-                v-highlight:word="'View'"
           > {{ item.status }} </span>
         </div>
         <div class="logwork">
