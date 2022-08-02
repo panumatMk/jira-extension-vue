@@ -29,6 +29,7 @@ import Toast from "primevue/toast";
 import Carousel from "primevue/carousel";
 import Fieldset from "primevue/fieldset";
 import ProgressSpinner from "primevue/progressspinner";
+import { hightlight } from "@/directives/Hightlight";
 
 const app = createApp(App);
 
@@ -54,6 +55,8 @@ app.component("TieredMenu", TieredMenu)
 
 app.use(VueSweetalert2);
 app.use(ToastService);
-app.directive("tooltip", Tooltip);
+
+app.directive("tooltip", Tooltip)
+  .directive("hightlight", hightlight)
 
 app.mount("#app");

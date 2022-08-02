@@ -7,14 +7,21 @@
         <div>
           <span v-tooltip.top="'artifact'"
                 v-if="item.parent.link">
-            <a :href="host+'/browse/'+item.parent.key" target="_blank">{{ item.parent.key
-              }}</a>  / </span>
-          <span v-tooltip.top="'subtask'"
-                class="link"><a :href="host+'/browse/'+item.key" target="_blank">{{ item.key }}</a></span>
-          <span style="line-height: 1.5"> : {{ item.summary }} </span>
+            <a :href="host+'/browse/'+item.parent.key" target="_blank"
+               v-hightlight="{ search, text: item?.parent?.key }">
+            </a>  /
+          </span>
+          <span v-tooltip.top="'subtask'" class="link">
+            <a :href="host+'/browse/'+item.key" target="_blank"
+               v-hightlight="{ search, text: item?.key }">
+            </a>
+          </span>
+          <span style="line-height: 1.5" v-hightlight="{ search, text: ': '+item?.summary }"></span>
           <span class="status"
                 :class="[item.status === 'Open'? 'open':'', item.status === 'In Progress'? 'in-progress':'']"
-          > {{ item.status }} </span>
+                v-hightlight="{ search, text: item?.status }"
+          >
+          </span>
         </div>
         <div class="logwork">
         <span>
@@ -87,9 +94,22 @@ const getList = computed(() => {
     || (item?.status || '').toUpperCase().includes(search.value.toUpperCase())
   );
 });
+
+function searchHighlight(value: string): any {
+  console.log('searchHighlight');
+  if(!search) return value;
+  const re = new RegExp(search.value, 'igm');
+  return value.replace(re, '<span class="highlighted-text">$&</span>');
+}
+
 </script>
 
 <style scoped lang="scss">
+::v-deep span.highlighted-text {
+  background-color: yellow;
+  color: #222832;
+}
+
 .input-search {
   position: absolute;
   top: 43px;
