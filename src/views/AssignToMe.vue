@@ -1,17 +1,21 @@
 <template>
+  <input-text class="input-search" v-model="search" placeholder="search"
+              type="text"></input-text>
   <div class="card-f">
-    <template v-for="item in list">
+    <template v-for="item in getList">
       <div class="card-l">
         <div>
-          <span v-tooltip.top="'artifact'"
-                :href="host+'/browse/'+item.parent.key" target="_blank"
-                v-if="item.parent.link"><a :href="item.parent.link">{{ item.parent.key
-            }}</a>  / </span>
+          <span v-tooltip.top="'artifact'" v-highlight="{search}"
+                v-if="item.parent.link">
+            <a :href="host+'/browse/'+item.parent.key" target="_blank">{{ item.parent.key
+              }}</a>  / </span>
           <span v-tooltip.top="'subtask'"
-                :href="host+'/browse/'+item.key" target="_blank"
-                class="link"><a :href="item.link">{{ item.key }}</a></span>
+                class="link"><a :href="host+'/browse/'+item.key" target="_blank">{{ item.key }}</a></span>
           <span style="line-height: 1.5"> : {{ item.summary }} </span>
-          <span class="status"> {{ item.status }} </span>
+          <span class="status"
+                :class="[item.status === 'Open'? 'open':'', item.status === 'In Progress'? 'in-progress':'']"
+                v-highlight:word="'View'"
+          > {{ item.status }} </span>
         </div>
         <div class="logwork">
         <span>
@@ -38,21 +42,23 @@
 
 <script setup lang="ts">
 
-import { onMounted, ref, toRef } from "vue";
+import { computed, onMounted, ref, toRef } from "vue";
 import type { SearchWorklog } from "@/services/AssignToMeServices";
 import { AssignToMeServices } from "@/services/AssignToMeServices";
 import { WorklogServices } from "@/services/WorklogServices";
-import { DateUtils, SweetAlert, Ticket } from "@/Utils/Utils";
+import type { Ticket } from "@/Utils/Utils";
+import { DateUtils, SweetAlert } from "@/Utils/Utils";
 import { store } from "@/store/Store";
 
 const dates = ref([new Date()]);
 const host = toRef(store.loginStage, "host");
-const list = ref<SearchWorklog[]>();
+
+const list = ref<SearchWorklog[]>([]);
+const search = ref<string>("");
 
 onMounted(() => {
   AssignToMeServices.getWorklogsIssuesAssignToCurrentUser()
     .subscribe(response => {
-      console.log(response);
       list.value = response;
     });
 });
@@ -73,9 +79,25 @@ function send(item: SearchWorklog) {
       }
     });
 }
+
+const getList = computed(() => {
+  return list.value?.filter(item =>
+    (item?.key || '').toUpperCase().includes(search.value.toUpperCase())
+    || (item?.parent?.key || '').toUpperCase().includes(search.value.toUpperCase())
+    || (item?.summary || '').toUpperCase().includes(search.value.toUpperCase())
+    || (item?.status || '').toUpperCase().includes(search.value.toUpperCase())
+  );
+});
 </script>
 
 <style scoped lang="scss">
+.input-search {
+  position: absolute;
+  top: 43px;
+  right: 50px;
+  width: 260px;
+}
+
 .card-f {
   overflow: scroll;
   height: 310px;
@@ -113,6 +135,16 @@ a {
   border-radius: 5px;
   border: 1px solid #2b323d;
   background-color: #2b323d;
+
+  &.open {
+    border: 1px solid #3569ba;
+    background-color: #3569ba;
+  }
+
+  &.in-progress {
+    border: 1px solid #35ba3b;
+    background-color: #35ba3b;
+  }
 }
 
 .logwork {
