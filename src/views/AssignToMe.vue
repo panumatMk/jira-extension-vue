@@ -42,6 +42,7 @@
       icon="pi pi-copy"
       class="p-button-rounded p-button-warning"
       v-tooltip.top="{value:'Copy Dates', class: 'copy-tooltip'}"
+      @click="copy"
     />
   </span>
 </template>
@@ -53,7 +54,7 @@ import type { SearchWorklog } from "@/services/AssignToMeServices";
 import { AssignToMeServices } from "@/services/AssignToMeServices";
 import { WorklogServices } from "@/services/WorklogServices";
 import type { Ticket } from "@/Utils/Utils";
-import { DateUtils, SweetAlert } from "@/Utils/Utils";
+import {DateUtils, SweetAlert, Utils} from "@/Utils/Utils";
 import { store } from "@/store/Store";
 
 const dates = ref([new Date()]);
@@ -101,7 +102,9 @@ function searchHighlight(value: string): any {
   const re = new RegExp(search.value, 'igm');
   return value.replace(re, '<span class="highlighted-text">$&</span>');
 }
-
+function copy() {
+  Utils.copyToClipboard(DateUtils.DATE_VAR);
+}
 </script>
 
 <style scoped lang="scss">
