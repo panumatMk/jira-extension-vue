@@ -5,7 +5,7 @@ export namespace Http {
     let authentication;
     const { loginStage } = store;
     if (loginStage?.useAccessToken) {
-      authentication = { ["app_token"]: loginStage.accessToken };
+      authentication = { ["Authorization"]: `Bearer ${loginStage.accessToken}` };
     } else {
       const b64 = btoa(`${loginStage?.username}:${loginStage?.password}`);
       authentication = { ["Authorization"]: `Basic ${b64}` };
