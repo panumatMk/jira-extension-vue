@@ -72,7 +72,7 @@
         </template>
     </DataTable>
 
-      <AddTicketDialog :display="openAddDialog" :mode="ticketMode" @onCloseModal="closeAddModal"
+      <AddTicketDialog :display="openAddDialog" :ticket="selectEditTicket" :mode="ticketMode" @onCloseModal="closeAddModal"
                        @onAddIssue="onAddIssue($event)"/>
   </div>
 </template>
@@ -115,14 +115,16 @@ function onCellEditComplete(event: any) {
 function openAddModal() {
     openAddDialog.value = true;
     ticketMode.value = 'add';
+    selectEditTicket.value= undefined;
 }
 
 function closeAddModal(open: boolean) {
   openAddDialog.value = open;
+  selectEditTicket.value = undefined;
 }
 
-function addIssue({id, label}: Ticket,mode:string = 'add') {
-    if (mode==='add') {
+function addIssue({id, label, mode = 'add'}: Ticket&{mode?:string}) {
+    if (mode === 'add') {
         const newTicket: Ticket = {
             id,
             label,
@@ -147,8 +149,8 @@ function editTicket(data: Ticket) {
     selectEditTicket.value = data;
 }
 
-function onAddIssue(data: Ticket | any) {
-    addIssue(data,'edit');
+function onAddIssue(data: any) {
+    addIssue(data);
     closeAddModal(false);
 }
 

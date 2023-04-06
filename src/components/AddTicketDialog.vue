@@ -18,16 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import {defineEmits, ref, computed} from "vue";
+import {defineEmits, ref, computed, watch} from "vue";
 import {SweetAlert} from "@/Utils/Utils";
 import {IssueServices} from "@/services/IssueServices";
 
 const jiraId = ref();
 
-const props = defineProps(["display", "mode"]);
+const props = defineProps(["display", "mode", "ticket"]);
 const emit = defineEmits(["onCloseModal", "onAddIssue"]);
 const labelMode = computed(() => props.mode === 'add' ? 'Add' : 'Edit');
-
+watch(() => props.ticket, (ticket) => {
+    jiraId.value = ticket?.id;
+});
 function closeModal() {
     jiraId.value = "";
     emit("onCloseModal", false);
@@ -39,7 +41,7 @@ function addIssue() {
             .subscribe({
                 next: (data) => {
                     jiraId.value = "";
-                    emit("onAddIssue", {id: data.id, label: data.summary});
+                    emit("onAddIssue", {id: data.id, label: data.summary} ,props.mode);
                 },
                 error: (err) => {
                     SweetAlert.error(err.status, err?.response?.errorMessages[0]);
@@ -50,7 +52,7 @@ function addIssue() {
             .subscribe({
                 next: (data) => {
                     jiraId.value = "";
-                    emit("onAddIssue", {id: data.id, label: data.summary});
+                    emit("onAddIssue", {id: data.id, label: data.summary} ,props.mode);
                 },
                 error: (err) => {
                     SweetAlert.error(err.status, err?.response?.errorMessages[0]);
