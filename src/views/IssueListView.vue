@@ -28,7 +28,7 @@
       </Column>
       <Column header="Action" headerStyle="max-width: 100px" bodyStyle="max-width: 100px">
         <template #body="{data,index}">
-          <div style="display: flex;gap:7px;">
+          <div style="display: flex;gap:7px;justify-content: flex-end;width:100%" >
             <Button icon="pi pi-arrow-up" class="p-button-rounded" @click="send(index)" />
             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="remove(data)" />
           </div>
@@ -36,12 +36,20 @@
       </Column>
       <template #groupheader="{data}">
         <div class="group-header">
+
           <span>
-            <a :href="host+'/browse/'+data['id']" target="_blank" style="color: white">[{{ data["id"] }}]</a> {{ data["label"] }}</span>
-          <span>
-            <Button icon="pi pi-plus" @click="addIssue(data)"
-                    class="p-button-sm p-button-rounded p-button-success p-button-outlined" />
+              <i class="pi pi-pencil" @click="editTicket(data)"></i>
+            <a :href="host+'/browse/'+data['id']" target="_blank" style="color: white">[{{
+                data["id"]
+                }}]</a> {{ data["label"] }}</span>
+            <span>
+
           </span>
+            <div style="display: flex;gap:7px;max-width: 100px;">
+
+            <Button icon="pi pi-plus" @click="addIssue(data)"
+                    class="p-button-sm p-button-rounded p-button-success p-button-outlined"/>
+            </div>
         </div>
       </template>
       <template #footer>
@@ -49,33 +57,34 @@
           <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openAddModal" />
           <span style="display: flex;gap: 5px;align-items: center;">
             <Calendar id="multiple" v-model="dates" selectionMode="multiple" :manualInput="false"
-                      dateFormat="dd/mm/yy" />
+                      dateFormat="dd/mm/yy"/>
             <Button
-              icon="pi pi-copy"
-              class="p-button-rounded p-button-warning"
-              v-tooltip.top="{value:'Copy Dates', class: 'copy-tooltip'}"
-              @click="copy"
+                    icon="pi pi-copy"
+                    class="p-button-rounded p-button-warning"
+                    v-tooltip.top="{value:'Copy Dates', class: 'copy-tooltip'}"
+                    @click="copy"
             />
           </span>
         </div>
       </template>
-      <template #empty>
-        No Issue found.
-      </template>
+        <template #empty>
+            No Issue found.
+        </template>
     </DataTable>
 
-    <AddTicketDialog :display="openAddDialog" @onCloseModal="closeAddModal" @onAddIssue="onAddIssue($event)" />
+      <AddTicketDialog :display="openAddDialog" :mode="ticketMode" @onCloseModal="closeAddModal"
+                       @onAddIssue="onAddIssue($event)"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, toRef } from "vue";
-import type { Ticket } from "@/Utils/Utils";
-import { DateUtils, JIRA, SweetAlert, Utils } from "@/Utils/Utils";
-import { iif, Subject } from "rxjs";
+import {onMounted, ref, toRef} from "vue";
+import type {Ticket} from "@/Utils/Utils";
+import {DateUtils, JIRA, SweetAlert, Utils} from "@/Utils/Utils";
+import {iif, Subject} from "rxjs";
 import AddTicketDialog from "@/components/AddTicketDialog.vue";
-import { store } from "@/store/Store";
-import { WorklogServices } from "@/services/WorklogServices";
+import {store} from "@/store/Store";
+import {WorklogServices} from "@/services/WorklogServices";
 
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
@@ -83,15 +92,17 @@ const dates = ref([new Date()]);
 const list = ref<Ticket[]>();
 const host = toRef(store.loginStage, "host");
 const openAddDialog = ref(false);
+const ticketMode = ref<'add' | 'edit'>();
+const selectEditTicket = ref<Ticket>();
 onMounted(() => {
-  JIRA.getTickets().subscribe((tickets) => {
-    list.value = tickets ? Object.values(tickets) : [];
-  });
+    JIRA.getTickets().subscribe((tickets) => {
+        list.value = tickets ? Object.values(tickets) : [];
+    });
 });
 
 const onRowReorder = (event: any) => {
-  list.value = event.value;
-  updateTickets$.next(event.value as Ticket[]);
+    list.value = event.value;
+    updateTickets$.next(event.value as Ticket[]);
 };
 
 function onCellEditComplete(event: any) {
@@ -102,47 +113,63 @@ function onCellEditComplete(event: any) {
 }
 
 function openAddModal() {
-  openAddDialog.value = true;
+    openAddDialog.value = true;
+    ticketMode.value = 'add';
 }
 
 function closeAddModal(open: boolean) {
   openAddDialog.value = open;
 }
 
-function addIssue({ id, label }: Ticket) {
-  const newTicket: Ticket = {
-    id,
-    label,
-    timeSpent: "",
-    comment: ""
-  };
-  list.value = [...list.value || [], newTicket];
-  updateTickets$.next(list.value);
-}
-
-function onAddIssue(data: any) {
-  addIssue(data);
-  closeAddModal(false);
-}
-
-function send(index: number){
-  const ticketList = (list.value? [...list.value]: []) as Ticket[];
-  const listData = ticketList.sort((a,b) => {
-    return a.id >= b.id ? 1 : -1;
-  });
-  const data = listData[index];
-  iif(() => dates.value.length === 1,
-    WorklogServices.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
-    WorklogServices.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
-  ).subscribe({
-    next: (results) => {
-      console.log(results);
-      SweetAlert.success();
-    },
-    error: (err) => {
-      SweetAlert.error(err.status);
+function addIssue({id, label}: Ticket,mode:string = 'add') {
+    if (mode==='add') {
+        const newTicket: Ticket = {
+            id,
+            label,
+            timeSpent: "",
+            comment: ""
+        };
+        list.value = [...list.value || [], newTicket];
+        updateTickets$.next(list.value);
+    } else {
+        const indexTicket = list.value!.findIndex((t) => t.id === selectEditTicket.value?.id);
+        if (indexTicket >= 0 && list.value?.length) {
+            list.value![indexTicket]!.id = id;
+            list.value![indexTicket]!.label = label;
+            updateTickets$.next(list.value || []);
+        }
     }
-  });
+}
+
+function editTicket(data: Ticket) {
+    openAddDialog.value = true;
+    ticketMode.value = 'edit';
+    selectEditTicket.value = data;
+}
+
+function onAddIssue(data: Ticket | any) {
+    addIssue(data,'edit');
+    closeAddModal(false);
+}
+
+function send(index: number) {
+    const ticketList = (list.value ? [...list.value] : []) as Ticket[];
+    const listData = ticketList.sort((a, b) => {
+        return a.id >= b.id ? 1 : -1;
+    });
+    const data = listData[index];
+    iif(() => dates.value.length === 1,
+        WorklogServices.addWorklog$(data, DateUtils.getSendingDate(dates.value[0])),
+        WorklogServices.addWorklogs$(data, DateUtils.getSendingDates(dates.value))
+    ).subscribe({
+        next: (results) => {
+            console.log(results);
+            SweetAlert.success();
+        },
+        error: (err) => {
+            SweetAlert.error(err.status);
+        }
+    });
 }
 
 function remove(data: Ticket) {

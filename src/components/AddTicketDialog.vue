@@ -1,49 +1,62 @@
 <template>
-  <Dialog header="Add" v-model:visible="props.display"
+  <Dialog :header="labelMode" v-model:visible="props.display"
           :closable="false"
           :style="{width: '400px'}" :modal="true">
-    <div>
-      <div class="p-inputgroup">
+      <div>
+          <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
                 Jira #
             </span>
-        <InputText placeholder="" v-model="jiraId" />
+              <InputText placeholder="" v-model="jiraId"/>
+          </div>
       </div>
-    </div>
     <template #footer>
       <Button label="Cancel" @click="closeModal" class="p-button-text" />
-      <Button label="Add" @click="addIssue" autofocus />
+        <Button :label="labelMode" @click="addIssue" autofocus/>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { defineEmits, ref } from "vue";
-import { Service } from "@/services/Service";
-import { SweetAlert } from "@/Utils/Utils";
-import { IssueServices } from "@/services/IssueServices";
+import {defineEmits, ref, computed} from "vue";
+import {SweetAlert} from "@/Utils/Utils";
+import {IssueServices} from "@/services/IssueServices";
 
 const jiraId = ref();
 
-const props = defineProps(["display"]);
+const props = defineProps(["display", "mode"]);
 const emit = defineEmits(["onCloseModal", "onAddIssue"]);
+const labelMode = computed(() => props.mode === 'add' ? 'Add' : 'Edit');
 
 function closeModal() {
-  jiraId.value = "";
-  emit("onCloseModal", false);
+    jiraId.value = "";
+    emit("onCloseModal", false);
 }
 
 function addIssue() {
-  IssueServices.getIssue$(jiraId.value)
-    .subscribe({
-      next: (data) => {
-        jiraId.value = "";
-        emit("onAddIssue", { id: data.id, label: data.summary });
-      },
-      error: (err) => {
-        SweetAlert.error(err.status, err?.response?.errorMessages[0]);
-      }
-    });
+    if (props.mode === 'add') {
+        IssueServices.getIssue$(jiraId.value)
+            .subscribe({
+                next: (data) => {
+                    jiraId.value = "";
+                    emit("onAddIssue", {id: data.id, label: data.summary});
+                },
+                error: (err) => {
+                    SweetAlert.error(err.status, err?.response?.errorMessages[0]);
+                }
+            });
+    } else {
+        IssueServices.getIssue$(jiraId.value)
+            .subscribe({
+                next: (data) => {
+                    jiraId.value = "";
+                    emit("onAddIssue", {id: data.id, label: data.summary});
+                },
+                error: (err) => {
+                    SweetAlert.error(err.status, err?.response?.errorMessages[0]);
+                }
+            });
+    }
 }
 </script>
 
