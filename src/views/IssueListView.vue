@@ -38,7 +38,7 @@
         <div class="group-header">
 
           <span>
-              <i class="pi pi-pencil" @click="editTicket(data)"></i>
+              <i class="pi pi-pencil" @click="editTicket(data)"></i>&nbsp;
             <a :href="host+'/browse/'+data['id']" target="_blank" style="color: white">[{{
                 data["id"]
                 }}]</a> {{ data["label"] }}</span>
