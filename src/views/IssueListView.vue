@@ -73,7 +73,7 @@
     </DataTable>
 
       <AddTicketDialog :display="openAddDialog" :ticket="selectEditTicket" :mode="ticketMode" @onCloseModal="closeAddModal"
-                       @onAddIssue="onAddIssue($event)"/>
+                       @onAddIssue="onAddIssue($event)" @onEditIssue="onEditIssue($event)"/>
   </div>
 </template>
 
@@ -154,6 +154,10 @@ function onAddIssue(data: any) {
     closeAddModal(false);
 }
 
+function onEditIssue(data: any) {
+    addIssue(data);
+    closeAddModal(false);
+}
 function send(index: number) {
     const ticketList = (list.value ? [...list.value] : []) as Ticket[];
     const listData = ticketList.sort((a, b) => {

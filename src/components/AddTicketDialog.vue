@@ -25,7 +25,7 @@ import {IssueServices} from "@/services/IssueServices";
 const jiraId = ref();
 
 const props = defineProps(["display", "mode", "ticket"]);
-const emit = defineEmits(["onCloseModal", "onAddIssue"]);
+const emit = defineEmits(["onCloseModal", "onAddIssue", "onEditIssue"]);
 const labelMode = computed(() => props.mode === 'add' ? 'Add' : 'Edit');
 watch(() => props.ticket, (ticket) => {
     jiraId.value = ticket?.id;
@@ -41,7 +41,7 @@ function addIssue() {
             .subscribe({
                 next: (data) => {
                     jiraId.value = "";
-                    emit("onAddIssue", {id: data.id, label: data.summary} ,props.mode);
+                    emit("onAddIssue", {id: data.id, label: data.summary});
                 },
                 error: (err) => {
                     SweetAlert.error(err.status, err?.response?.errorMessages[0]);
@@ -52,7 +52,7 @@ function addIssue() {
             .subscribe({
                 next: (data) => {
                     jiraId.value = "";
-                    emit("onAddIssue", {id: data.id, label: data.summary} ,props.mode);
+                    emit("onEditIssue", {id: data.id, label: data.summary, mode: props.mode});
                 },
                 error: (err) => {
                     SweetAlert.error(err.status, err?.response?.errorMessages[0]);
