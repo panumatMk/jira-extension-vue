@@ -89,7 +89,7 @@ import {WorklogServices} from "@/services/WorklogServices";
 const updateTickets$ = new Subject<Ticket[]>();
 updateTickets$.subscribe((tickets) => JIRA.updateTickets(tickets));
 const dates = ref([new Date()]);
-const list = ref<Ticket[]>();
+const list = ref<Ticket[]>([]);
 const host = toRef(store.loginStage, "host");
 const openAddDialog = ref(false);
 const ticketMode = ref<'add' | 'edit'>();
@@ -134,11 +134,19 @@ function addIssue({id, label, mode = 'add'}: Ticket&{mode?:string}) {
         list.value = [...list.value || [], newTicket];
         updateTickets$.next(list.value);
     } else {
-        const indexTicket = list.value!.findIndex((t) => t.id === selectEditTicket.value?.id);
-        if (indexTicket >= 0 && list.value?.length) {
-            list.value![indexTicket]!.id = id;
-            list.value![indexTicket]!.label = label;
-            updateTickets$.next(list.value || []);
+
+        if (list.value?.length > 0) {
+            const cloneList = [...list.value || []];
+            const newCloneList = cloneList.map(item => {
+                console.log(id, label, mode, selectEditTicket.value?.id,item.id,cloneList);
+                if (item.id === selectEditTicket.value!.id) {
+                    item.id = id;
+                    item.label = label;
+                    return item;
+                }
+                return item;
+            })
+            updateTickets$.next(newCloneList || []);
         }
     }
 }
@@ -146,7 +154,7 @@ function addIssue({id, label, mode = 'add'}: Ticket&{mode?:string}) {
 function editTicket(data: Ticket) {
     openAddDialog.value = true;
     ticketMode.value = 'edit';
-    selectEditTicket.value = data;
+    selectEditTicket.value = {...data};
 }
 
 function onAddIssue(data: any) {
